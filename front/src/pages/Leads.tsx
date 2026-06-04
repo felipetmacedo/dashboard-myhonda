@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import { format, isValid, parseISO, differenceInMinutes } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import * as XLSX from "xlsx";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import {
@@ -15,8 +16,9 @@ import { useAdvancedTable } from "@/hooks/useAdvancedTable";
 import { useReportQueryFilters } from "@/hooks/useReportQueryFilters";
 import { ReportQueryFilters } from "@/components/ReportQueryFilters";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table } from "@/components/ui/table";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileDown } from "lucide-react";
 import { fetchLeads } from "@/services/reportsApi";
 import { Lead } from "@/services/reportsTypes";
 
@@ -185,6 +187,49 @@ const Leads = () => {
     initialColumnVisibility: HIDDEN_COLUMNS,
   });
 
+  const exportToExcel = useCallback(() => {
+    if (!data.length) return;
+
+    const rows = table.getFilteredRowModel().rows.map(row => {
+      const d = row.original;
+      return {
+        "Data do Lead":      d.data_criacao_lead ? format(parseISO(d.data_criacao_lead), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "",
+        "Cadastro Sistema":  d.DATA_CADASTRO     ? format(parseISO(d.DATA_CADASTRO),     "dd/MM/yyyy HH:mm", { locale: ptBR }) : "",
+        "SLA (min)":         d.sla_minutos ?? "",
+        "Nome":              d.NOME ?? "",
+        "CPF":               d.CPF ?? "",
+        "Celular":           d.CELULAR ?? "",
+        "E-mail":            d.EMAIL ?? "",
+        "Tipo":              d.TIPO?.trim() ?? "",
+        "Tipo Original":     d.tipo_original ?? "",
+        "Produto":           d.PRODUTO ?? "",
+        "Versão":            d.versao ?? "",
+        "Origem":            d.ORIGEM ?? "",
+        "Sub-Origem":        d.SUB_ORIGEM ?? "",
+        "CRM Integração":    d.CRM_INTEGRACAO ?? "",
+        "Tentativas":        d.QTD_TENTATIVAS ?? 0,
+        "Perfil":            d.perfil ?? "",
+        "Idade":             d.idade ?? "",
+        "Folga Orçamentária": d.folga_orcamentaria ?? "",
+        "Escolaridade":      d.escolaridade ?? "",
+        "Interesses":        d.interesses ?? "",
+        "Comport. Digital":  d.comportamento_digital ?? "",
+        "Comport. Financeiro": d.comportamento_financeiro ?? "",
+        "Ano Modelo":        d.ano_modelo ?? "",
+        "Tipo Serviço":      d.tipo_servico ?? "",
+        "CODHDA":            d.CODHDA ?? "",
+        "ID":                d.ID ?? "",
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Leads");
+
+    const now = format(new Date(), "yyyy-MM-dd_HH-mm");
+    XLSX.writeFile(wb, `leads_myhonda_${now}.xlsx`);
+  }, [data, table]);
+
   return (
     <Layout>
       <div className="p-6 space-y-4">
@@ -232,7 +277,18 @@ const Leads = () => {
                 resetColumnOrder={resetColumnOrder}
                 filteredRowCount={filteredRowCount}
                 totalRowCount={totalRowCount}
-              />
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5 text-xs"
+                  onClick={exportToExcel}
+                  disabled={!data.length}
+                >
+                  <FileDown className="h-3.5 w-3.5" />
+                  Exportar Excel
+                </Button>
+              </AdvancedTableToolbar>
             </div>
             <div className="overflow-x-auto">
               <Table>
