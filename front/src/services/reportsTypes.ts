@@ -30,6 +30,7 @@ export interface Lead {
   versao: string | null;
   ano_modelo: string | null;
   tipo_servico: string | null;
+  sla_minutos: number | null;
 }
 
 export interface LeadsRequest {

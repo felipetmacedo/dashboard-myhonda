@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import { format, isValid, parseISO } from "date-fns";
+import { format, isValid, parseISO, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
@@ -126,6 +126,28 @@ const Leads = () => {
           {formatLeadDateTime(getValue<string>())}
         </span>
       ),
+    },
+    {
+      id: "sla",
+      header: "SLA",
+      size: 100,
+      accessorFn: (row) => row.sla_minutos,
+      cell: ({ getValue }) => {
+        const mins = getValue<number | null>();
+        if (mins === null || mins === undefined || mins < 0) {
+          return <span className="text-muted-foreground text-xs">—</span>;
+        }
+        if (mins < 60) {
+          return <Badge variant="outline" className="text-green-700 border-green-300 bg-green-50">{mins}min</Badge>;
+        }
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        const label = m > 0 ? `${h}h ${m}min` : `${h}h`;
+        if (h < 6) {
+          return <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">{label}</Badge>;
+        }
+        return <Badge variant="outline" className="text-red-700 border-red-300 bg-red-50">{label}</Badge>;
+      },
     },
     // — ocultas por padrão (detalhes / integração) —
     { accessorKey: "ID", header: "ID" },

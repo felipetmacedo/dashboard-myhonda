@@ -49,7 +49,8 @@ export default class ReportsService {
 				ihs_myhonda_integracao.comportamento_financeiro,
 				ihs_myhonda_integracao.versao,
 				ihs_myhonda_integracao.ano_modelo,
-				ihs_myhonda_integracao.tipo_servico
+				ihs_myhonda_integracao.tipo_servico,
+				TIMESTAMPDIFF(MINUTE, ihs_myhonda_integracao.data_criacao_lead, ihs_myhonda_integracao.DATA_CADASTRO) AS sla_minutos
 			FROM
 				ihs_myhonda_integracao
 			WHERE
