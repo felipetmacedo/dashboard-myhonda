@@ -86,5 +86,5 @@ Antes de commitar, `git pull` (outros podem ter subido alterações).
 
 - Stack único no Portainer (`docker-compose.yml` raiz) + secret `PORTAINER_WEBHOOK`.
 - Confirmar nome da rede externa do Traefik (default: `sagzap`).
-- Logo Honda oficial em `front/src/assets/logo-myhonda.png` (hoje placeholder).
+- Logo Honda oficial em `front/src/assets/logo-myhonda.png` (hoje placeholder)
 - Auth: hoje login via webhook n8n; migrar para `/auth` (JWT) da API.
