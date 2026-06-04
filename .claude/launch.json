@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "front",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "front"],
+      "port": 8080,
+      "autoPort": true
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["--cwd", "api", "start:dev"],
+      "port": 3000
+    }
+  ]
+}

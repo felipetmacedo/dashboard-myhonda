@@ -1,0 +1,37 @@
+services:
+  myhonda-sfs-api:
+    image: ghcr.io/felipetmacedo/dashboard-myhonda:api-latest
+    environment:
+      SFSEA_DB_NAME: ${SFSEA_DB_NAME}
+      SFSEA_DB_USER: ${SFSEA_DB_USER}
+      SFSEA_DB_PASSWORD: ${SFSEA_DB_PASSWORD}
+      SFSEA_DB_HOST: ${SFSEA_DB_HOST}
+      SFSEA_DB_PORT: ${SFSEA_DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      NODE_ENV: production
+      PORT: "3000"
+      TZ: America/Recife
+    networks:
+      - sagzap
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=sagzap"
+        - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+        - "traefik.http.routers.myhonda-sfs-api.entrypoints=websecure"
+        - "traefik.http.routers.myhonda-sfs-api.middlewares=sslheader"
+        - "traefik.http.routers.myhonda-sfs-api.priority=1"
+        - "traefik.http.routers.myhonda-sfs-api.rule=Host(`express-myhonda.sagzap.com.br`)"
+        - "traefik.http.routers.myhonda-sfs-api.service=myhonda-sfs-api"
+        - "traefik.http.routers.myhonda-sfs-api.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.myhonda-sfs-api.loadbalancer.passHostHeader=true"
+        - "traefik.http.services.myhonda-sfs-api.loadbalancer.server.port=3000"
+
+networks:
+  sagzap:
+    external: true
+    name: sagzap

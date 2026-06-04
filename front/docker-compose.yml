@@ -1,0 +1,21 @@
+services:
+  myhonda-sfs-front:
+    image: ghcr.io/felipetmacedo/dashboard-myhonda:front-latest
+    networks:
+      - sagzap
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=sagzap"
+        - "traefik.http.routers.myhonda-sfs-front.entrypoints=websecure"
+        - "traefik.http.routers.myhonda-sfs-front.priority=1"
+        - "traefik.http.routers.myhonda-sfs-front.rule=Host(`myhonda.sagzap.com.br`)"
+        - "traefik.http.routers.myhonda-sfs-front.service=myhonda-sfs-front"
+        - "traefik.http.routers.myhonda-sfs-front.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.myhonda-sfs-front.loadbalancer.passHostHeader=true"
+        - "traefik.http.services.myhonda-sfs-front.loadbalancer.server.port=80"
+
+networks:
+  sagzap:
+    external: true
+    name: sagzap
