@@ -1,79 +1,25 @@
-import { Store, Member, Address } from '@models';
-import { ExceptionUtils, EmailTemplates, Utils, LoggerUtils, PaginationUtils } from '@utils';
-import httpStatus from 'http-status';
+import { Store, StoreCompany, IhsCompany, Member } from '@models';
+import { ExceptionUtils, LoggerUtils, PaginationUtils } from '@utils';
 import Database from '@database';
-import UserService from './user';
-import { EmailService } from '@services';
+import httpStatus from 'http-status';
 
 export default class StoreService {
 	constructor() {
 		this.database = new Database();
-		this.userService = new UserService();
-		this.emailService = new EmailService();
 	}
 
 	async create(data) {
 		const transaction = await this.database.masterInstance.transaction();
 
 		try {
-			const existingStore = await Store.findOne({
-				where: {
-					cnpj: data.cnpj,
-					is_deleted: false
-				}
-			});
+			const store = await Store.create({ name: data.name }, { transaction });
 
-			if (existingStore) {
-				throw new ExceptionUtils({
-					status: httpStatus.BAD_REQUEST,
-					code: 'BAD_REQUEST',
-					message: 'CNPJ já cadastrado'
-				});
+			if (data.codhdas?.length) {
+				await StoreCompany.bulkCreate(
+					data.codhdas.map(codhda => ({ storeId: store.id, codhda })),
+					{ transaction }
+				);
 			}
-
-			const address = await Address.create({
-				cep: data.cep,
-				address: data.address,
-				number: data.number,
-				complement: data.complement,
-				neighborhood: data.neighborhood,
-				city: data.city,
-				state: data.state
-			}, { transaction });
-
-			const store = await Store.create({
-				name: data.name,
-				razao_social: data.razao_social,
-				nome_fantasia: data.nome_fantasia,
-				inscricao_estadual: data.inscricao_estadual,
-				inscricao_municipal: data.inscricao_municipal,
-				email: data.email,
-				cnpj: data.cnpj,
-				address_id: address.id,
-			}, { transaction });
-
-			const password = Utils.generateRandomPassword();
-
-			const userData = {
-				name: data.name,
-				email: data.email,
-				password,
-				document: data.cnpj,
-				store_id: store.id,
-				address_id: address.id,
-				logged_user_id: data.logged_user_id,
-			};
-
-			const user = await this.userService.createTeamUser(userData, { transaction });
-
-			const emailOptions = {
-				to: data.email,
-				subject: 'Bem-vindo ao SIG - Suas Credenciais de Acesso',
-				text: 'Bem-vindo ao SIG - Suas Credenciais de Acesso',
-				html: EmailTemplates.getWelcomeEmailTemplate(user.name, data.email, password)
-			};
-
-			await this.emailService.send(emailOptions);
 
 			await transaction.commit();
 
@@ -87,14 +33,11 @@ export default class StoreService {
 
 	async find(filter) {
 		const store = await Store.findOne({
-			where: {
-				id: filter.id,
-				is_deleted: false
-			},
+			where: { id: filter.id, is_deleted: false },
 			include: [{
-				model: Address,
-				as: 'address',
-				attributes: ['id', 'cep', 'address', 'number', 'complement', 'neighborhood', 'city', 'state']
+				model: StoreCompany,
+				as: 'companies',
+				include: [{ model: IhsCompany, as: 'company' }]
 			}]
 		});
 
@@ -112,32 +55,51 @@ export default class StoreService {
 	async list(filter) {
 		const pagination = PaginationUtils.config({
 			page: filter.page || 1,
-			items_per_page: filter.itemsPerPage || 10
+			items_per_page: filter.items_per_page || filter.itemsPerPage || 200
 		});
 
-		const [stores, total] = await Promise.all([
-			Store.findAll({
+		const total = await Store.count({ where: { is_deleted: false } });
+
+		let stores;
+		try {
+			stores = await Store.findAll({
 				...pagination.getQueryParams(),
-				where: {
-					is_deleted: false
-				},
-				attributes: ['id', 'name', 'cnpj', 'email', 'created_at', 'updated_at'],
-				include: {
-					model: Address,
-					as: 'address',
-					attributes: ['id', 'complement', 'neighborhood', 'city', 'state', 'cep', 'address', 'number']
-				}
-			}),
-			Store.count({
-				where: {
-					is_deleted: false
-				}
-			})
-		]);
+				where: { is_deleted: false },
+				include: [{
+					model: StoreCompany,
+					as: 'companies',
+					required: false,
+					include: [{
+						model: IhsCompany,
+						as: 'company',
+						required: false,
+					}]
+				}]
+			});
+		} catch (err) {
+			LoggerUtils.error('Store list with IhsCompany failed, retrying without:', err.message);
+			try {
+				stores = await Store.findAll({
+					...pagination.getQueryParams(),
+					where: { is_deleted: false },
+					include: [{
+						model: StoreCompany,
+						as: 'companies',
+						required: false,
+					}]
+				});
+			} catch (err2) {
+				LoggerUtils.error('Store list with StoreCompany failed, retrying plain:', err2.message);
+				stores = await Store.findAll({
+					...pagination.getQueryParams(),
+					where: { is_deleted: false },
+				});
+			}
+		}
 
 		return {
 			...pagination.mount(total),
-			items: stores.map(store => store.toJSON())
+			items: stores.map(s => s.toJSON())
 		};
 	}
 
@@ -145,48 +107,27 @@ export default class StoreService {
 		const transaction = await this.database.masterInstance.transaction();
 
 		try {
-			const store = await Store.findOne({
-				where: {
-					id: filter.id,
-					is_deleted: false
-				}
-			});
+			const store = await Store.findOne({ where: { id: filter.id, is_deleted: false } });
 
 			if (!store) {
 				throw new ExceptionUtils({
 					status: httpStatus.NOT_FOUND,
 					code: 'NOT_FOUND',
-					message: 'Líder não encontrado'
+					message: 'Loja não encontrada'
 				});
 			}
 
-			await Address.update({
-				cep: data.cep,
-				address: data.address,
-				number: data.number,
-				complement: data.complement,
-				neighborhood: data.neighborhood,
-				city: data.city,
-				state: data.state
-			}, {
-				where: {
-					id: store.address_id
-				},
-				transaction
-			});
+			if (data.name) {
+				await Store.update({ name: data.name }, { where: { id: store.id }, transaction });
+			}
 
-			await Store.update({
-				name: data.name,
-				razao_social: data.razao_social,
-				nome_fantasia: data.nome_fantasia,
-				inscricao_estadual: data.inscricao_estadual,
-				inscricao_municipal: data.inscricao_municipal,
-				email: data.email,
-				cnpj: data.cnpj
-			}, {
-				where: { id: store.id },
-				transaction
-			});
+			if (data.codhdas && Array.isArray(data.codhdas)) {
+				await StoreCompany.destroy({ where: { storeId: store.id }, transaction });
+				await StoreCompany.bulkCreate(
+					data.codhdas.map(codhda => ({ storeId: store.id, codhda })),
+					{ transaction }
+				);
+			}
 
 			await transaction.commit();
 
@@ -202,43 +143,38 @@ export default class StoreService {
 		const transaction = await this.database.masterInstance.transaction();
 
 		try {
-			const store = await Store.findOne({
-				where: {
-					id: filter.id,
-					is_deleted: false
-				}
-			});
+			const store = await Store.findOne({ where: { id: filter.id, is_deleted: false } });
 
 			if (!store) {
 				throw new ExceptionUtils({
 					status: httpStatus.NOT_FOUND,
 					code: 'NOT_FOUND',
-					message: 'Líder não encontrado'
+					message: 'Loja não encontrada'
 				});
 			}
 
 			await Member.update(
 				{ isDeleted: true },
-				{
-					where: { storeId: filter.id },
-					transaction
-				}
+				{ where: { storeId: filter.id }, transaction }
 			);
 
-			await store.update(
-				{ is_deleted: true },
-				{ transaction }
-			);
-
+			await store.update({ is_deleted: true }, { transaction });
 			await transaction.commit();
 
-			return {
-				message: 'Líder deletado com sucesso'
-			};
+			return { message: 'Loja removida com sucesso' };
 		} catch (error) {
 			LoggerUtils.error('Error deleting store', error);
 			await transaction.rollback();
 			throw error;
 		}
+	}
+
+	async listCompanies() {
+		return IhsCompany.findAll({
+			where: { ativa: 1 },
+			attributes: ['ihscompany_id', 'codhda', 'empresa', 'sigla_loja', 'cnpj', 'ihscompany_name'],
+			order: [['empresa', 'ASC']],
+			raw: true,
+		});
 	}
 }

@@ -1,31 +1,41 @@
-
 export interface LoginRequest {
-  user: string;
-  pass: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  expires: number;
 }
 
 export interface Loja {
   codhda: string;
   empresa: string;
-  token_whatsapp: string;
+  sigla_loja: string;
 }
 
-export interface LoginResponse {
-  servico: string;
-  retorno: boolean;
-  message: string;
+export interface SessionResponse {
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    isAdmin: boolean;
+  };
+  store: { id: number; name: string } | null;
   lojas: Loja[];
+  codhdaList: string[];
+  permissions: string[];
 }
 
 export interface AuthUser {
-  user: string;
+  id: number;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+  permissions: string[];
   lojas: Loja[];
+  codhdaList: string[];
+  store: SessionResponse['store'];
+  token: string;
   isAuthenticated: boolean;
 }
-
-/** Verifica se o usuário é master (admin). Centraliza a lógica para evitar duplicação. */
-export const checkIsMasterUser = (user: AuthUser | null): boolean => {
-  if (!user) return false;
-  const u = user.user?.toLowerCase();
-  return u === 'master' || u === 'administrador' || u === 'admin';
-};

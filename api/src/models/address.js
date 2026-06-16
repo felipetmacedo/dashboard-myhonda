@@ -46,8 +46,7 @@ export default class Address extends BaseModel {
 		);
 	}
 
-	static associate(models) {
-		this.hasOne(models.store, { foreignKey: 'address_id' });
-		this.hasOne(models.user, { foreignKey: 'address_id' });
+	static associate(_models) {
+		// address_id removed from new_stores and new_users — no associations needed
 	}
 }

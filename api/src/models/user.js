@@ -28,14 +28,6 @@ export default class User extends BaseModel {
 				defaultValue: false,
 				field: 'is_email_verified'
 			},
-			address_id: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				references: {
-					model: 'addresses',
-					key: 'id'
-				}
-			},
 			isAdmin: {
 				type: DataTypes.BOOLEAN,
 				allowNull: false,
@@ -56,7 +48,7 @@ export default class User extends BaseModel {
 			underscored: true,
 			sequelize: sequelize,
 			modelName: 'user',
-			tableName: 'users',
+			tableName: 'new_users',
 			createdAt: 'created_at',
 			updatedAt: 'updated_at',
 			hooks: {
@@ -67,27 +59,12 @@ export default class User extends BaseModel {
 		});
 	}
 
-	/**
-	 * Set up model associations.
-	 *
-	 * @param {Object} models - Models from sequelize.
-	 *
-	 * @returns {undefined}
-	 */
 	static associate(models) {
-		this.hasOne(models.member, {
-			foreignKey: 'user_id'
-		});
-
-		this.hasMany(models.member, {
-			foreignKey: 'user_id'
-		});
-
+		this.hasOne(models.member, { foreignKey: 'user_id' });
+		this.hasMany(models.member, { foreignKey: 'user_id' });
 		this.hasMany(models.user_permission, {
 			foreignKey: 'user_id',
 			as: 'permissions'
 		});
-
-		this.belongsTo(models.address, { foreignKey: 'address_id' });
 	}
 }

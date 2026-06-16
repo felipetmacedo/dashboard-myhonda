@@ -1,7 +1,7 @@
 import BaseRoutes from './base';
 import { StoreSchema } from '@schemas';
 import { StoreController } from '@controllers';
-import { PermissionMiddleware } from '@middlewares';
+import { PermissionMiddleware, AdminUserMiddleware } from '@middlewares';
 
 class StoreRoutes extends BaseRoutes {
 	constructor() {
@@ -10,6 +10,11 @@ class StoreRoutes extends BaseRoutes {
 	}
 
 	setup() {
+		this.router.get('/companies',
+			AdminUserMiddleware.isAuthorized,
+			this.storeController.listCompanies
+		);
+
 		this.router.post('/',
 			PermissionMiddleware.hasPermission('STORES.CREATE'),
 			this.SchemaValidator.validate(StoreSchema.create),

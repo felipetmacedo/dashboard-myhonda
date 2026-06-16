@@ -20,7 +20,7 @@ export default class UserRecoverPassword extends BaseModel {
 			underscored: false,
 			sequelize: sequelize,
 			modelName: 'user_recover_password',
-			tableName: 'user_recover_passwords',
+			tableName: 'new_user_recover_passwords',
 			createdAt: 'created_at',
 			updatedAt: 'updated_at'
 		});

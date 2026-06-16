@@ -1,4 +1,4 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 
 interface LayoutProps {
@@ -10,8 +10,14 @@ export function Layout({ children }: LayoutProps) {
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full overflow-hidden">
         <AppSidebar />
-        
+
         <div className="flex-1 flex flex-col min-w-0">
+          {/* Mobile topbar — só visível em telas pequenas */}
+          <header className="flex md:hidden items-center h-12 px-3 border-b bg-background shrink-0">
+            <SidebarTrigger className="h-8 w-8" />
+            <span className="ml-3 text-sm font-semibold text-primary">MyHonda SFS</span>
+          </header>
+
           <main className="flex-1 overflow-x-auto overflow-y-auto">
             {children}
           </main>

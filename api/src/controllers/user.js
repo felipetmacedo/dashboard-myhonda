@@ -1,5 +1,5 @@
 import BaseController from './base';
-import { UserService, UserPermissionService } from '@services';
+import { UserService, UserPermissionService, AuthService } from '@services';
 
 class UserController extends BaseController {
 	constructor() {
@@ -7,6 +7,7 @@ class UserController extends BaseController {
 
 		this.userService = new UserService();
 		this.userPermissionService = new UserPermissionService();
+		this.authService = new AuthService();
 
 		this.list = this.list.bind(this);
 		this.getInfo = this.getInfo.bind(this);
@@ -19,6 +20,7 @@ class UserController extends BaseController {
 		this.removePermission = this.removePermission.bind(this);
 		this.getPermissions = this.getPermissions.bind(this);
 		this.updateProfile = this.updateProfile.bind(this);
+		this.resetUserPassword = this.resetUserPassword.bind(this);
 	}
 
 	async addPermissions(req, res) {
@@ -187,6 +189,18 @@ class UserController extends BaseController {
 			});
 
 			this.sendSuccess({ data: response, res });
+		} catch (error) {
+			this.sendError({ error, req, res });
+		}
+	}
+
+	async resetUserPassword(req, res) {
+		try {
+			await this.authService.resetUserPassword({
+				userId: req.filter.id,
+				newPassword: req.data?.newPassword || req.body?.newPassword
+			});
+			this.sendSuccess({ data: { message: 'Senha redefinida com sucesso' }, res });
 		} catch (error) {
 			this.sendError({ error, req, res });
 		}

@@ -11,6 +11,7 @@ export default class StoreController extends BaseController {
 		this.list = this.list.bind(this);
 		this.create = this.create.bind(this);
 		this.delete = this.delete.bind(this);
+		this.listCompanies = this.listCompanies.bind(this);
 	}
 
 	async create(req, res) {
@@ -19,7 +20,6 @@ export default class StoreController extends BaseController {
 				...req.data,
 				logged_user_id: req.auth.id,
 			});
-
 			this.sendSuccess({ data: store, res });
 		} catch (error) {
 			this.sendError({ error, res });
@@ -28,10 +28,7 @@ export default class StoreController extends BaseController {
 
 	async find(req, res) {
 		try {
-			const store = await this.storeService.find({
-				id: req.auth.storeId
-			});
-
+			const store = await this.storeService.find({ id: req.auth.storeId });
 			this.sendSuccess({ data: store, res });
 		} catch (error) {
 			this.sendError({ error, res });
@@ -40,13 +37,10 @@ export default class StoreController extends BaseController {
 
 	async update(req, res) {
 		try {
-			const store = await this.storeService.update({
-				id: req.filter.id
-			}, {
-				...req.data,
-				updater_id: req.auth.id
-			});
-
+			const store = await this.storeService.update(
+				{ id: req.filter.id },
+				{ ...req.data, updater_id: req.auth.id }
+			);
 			this.sendSuccess({ data: store, res });
 		} catch (error) {
 			this.sendError({ error, res });
@@ -56,9 +50,9 @@ export default class StoreController extends BaseController {
 	async list(req, res) {
 		try {
 			const stores = await this.storeService.list(req.filter);
-
 			this.sendSuccess({ data: stores, res });
 		} catch (error) {
+			console.error('[StoreController.list] Error:', error.message, error.stack);
 			this.sendError({ error, res });
 		}
 	}
@@ -66,8 +60,16 @@ export default class StoreController extends BaseController {
 	async delete(req, res) {
 		try {
 			const store = await this.storeService.delete(req.filter);
-
 			this.sendSuccess({ data: store, res });
+		} catch (error) {
+			this.sendError({ error, res });
+		}
+	}
+
+	async listCompanies(req, res) {
+		try {
+			const companies = await this.storeService.listCompanies();
+			this.sendSuccess({ data: companies, res });
 		} catch (error) {
 			this.sendError({ error, res });
 		}

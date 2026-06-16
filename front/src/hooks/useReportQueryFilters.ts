@@ -26,7 +26,7 @@ export function useReportQueryFilters(options: UseReportQueryFiltersOptions = {}
   const { user } = useAuth();
   const { autoApplyOnStoresReady = true } = options;
 
-  const isAdministrador = user?.user === "ADMINISTRADOR";
+  const isAdministrador = user?.isAdmin === true;
 
   const [dateRange, setDateRange] = useState<DateRange>(getCurrentMonthDateRange);
   const [selectedCodhdas, setSelectedCodhdas] = useState<string[]>([]);

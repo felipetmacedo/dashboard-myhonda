@@ -23,7 +23,7 @@ export default class PermissionModule extends BaseModel {
 			underscored: false,
 			sequelize: sequelize,
 			modelName: 'permission_module',
-			tableName: 'permission_modules',
+			tableName: 'new_permission_modules',
 		});
 	}
 }

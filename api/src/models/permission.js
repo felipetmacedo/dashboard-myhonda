@@ -28,7 +28,7 @@ export default class Permission extends BaseModel {
 			underscored: false,
 			sequelize: sequelize,
 			modelName: 'permission',
-			tableName: 'permissions',
+			tableName: 'new_permissions',
 		});
 	}
 

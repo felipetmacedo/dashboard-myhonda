@@ -30,19 +30,19 @@ export const LoginForm = () => {
     setIsSubmitting(true);
 
     try {
-      const success = await login({ user: email, pass: password });
+      const result = await login({ email, password });
 
-      if (!success) {
+      if (result !== true) {
         toast({
-          title: "Credenciais inválidas",
-          description: "Verifique usuário e senha e tente novamente.",
+          title: "Erro ao entrar",
+          description: typeof result === 'string' ? result : "Verifique e-mail e senha e tente novamente.",
           variant: "destructive",
         });
       }
-    } catch {
+    } catch (err: any) {
       toast({
         title: "Erro de conexão",
-        description: "Não foi possível conectar ao servidor.",
+        description: err?.message || "Não foi possível conectar ao servidor.",
         variant: "destructive",
       });
     } finally {
@@ -128,14 +128,14 @@ export const LoginForm = () => {
 
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Usuário
+                E-mail
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="email"
-                  type="text"
-                  placeholder="Digite seu usuário"
+                  type="email"
+                  placeholder="Digite seu e-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubmitting}

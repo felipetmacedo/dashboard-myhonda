@@ -27,6 +27,9 @@ class UserRoutes extends BaseRoutes {
 		this.router.get('/:id/permissions', AdminUserMiddleware.isAuthorized, this.SchemaValidator.validate(UserSchema.getPermissions), this.userController.getPermissions);
 		this.router.delete('/:id/permissions/:permissionId', AdminUserMiddleware.isAuthorized, this.SchemaValidator.validate(UserSchema.removePermission), this.userController.removePermission);
 
+		// Admin Flows
+		this.router.put('/:id/reset-password', AdminUserMiddleware.isAuthorized, this.userController.resetUserPassword);
+
 		return this.router;
 	}
 }

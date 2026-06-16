@@ -50,5 +50,23 @@ export default {
 				}),
 			token: yup.string().required()
 		}).noUnknown()
+	},
+	changePassword: {
+		body: yup.object().shape({
+			currentPassword: yup.string().transform(sanitizeValue).required(),
+			newPassword: yup.string().transform(sanitizeValue).required(),
+			confirmPassword: yup.string()
+				.transform(sanitizeValue)
+				.required()
+				.test('passwords-match', 'Passwords must match', function(value) {
+					return value === this.parent.newPassword;
+				})
+		}).noUnknown()
+	},
+	resetUserPassword: {
+		body: yup.object().shape({
+			userId: yup.number().required(),
+			newPassword: yup.string().transform(sanitizeValue).required()
+		}).noUnknown()
 	}
 };

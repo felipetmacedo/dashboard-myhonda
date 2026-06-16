@@ -6,6 +6,7 @@ import {
   User,
   PanelLeftClose,
   PanelLeftOpen,
+  ShieldCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -26,18 +27,27 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
 
-const menuItems = [
+const baseMenuItems = [
   {
     title: "Dashboard Principal",
     url: "/",
     icon: Home,
     description: "Visão Geral",
+    adminOnly: false,
   },
   {
     title: "Leads MyHonda",
     url: "/reports/leads",
     icon: BarChart2,
     description: "Integração MyHonda",
+    adminOnly: false,
+  },
+  {
+    title: "Administração",
+    url: "/admin",
+    icon: ShieldCheck,
+    description: "Usuários e Lojas",
+    adminOnly: true,
   },
 ];
 
@@ -50,6 +60,7 @@ export function AppSidebar() {
 
   const isCollapsed = state === "collapsed";
   const isActive = (path: string) => currentPath === path;
+  const menuItems = baseMenuItems.filter(item => !item.adminOnly || user?.isAdmin);
 
   const handleNavigation = () => {
     if (window.innerWidth < 768) {
@@ -142,7 +153,7 @@ export function AppSidebar() {
               <User className="h-4 w-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user?.user}</p>
+              <p className="text-sm font-medium truncate">{user?.name ?? user?.email}</p>
               <p className="text-xs text-muted-foreground">Usuário ativo</p>
             </div>
           </div>

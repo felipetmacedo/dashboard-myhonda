@@ -40,6 +40,9 @@ export default class AuthUtils {
 				email: user.email,
 				isAdmin: user.isAdmin,
 				storeId,
+				codhdaList: user.codhdaList || [],
+				lojas: user.lojas || [],
+				permissions: user.permissions || [],
 			}
 		}, config.app.secretKey);
 

@@ -1,4 +1,6 @@
 import Store from './store';
+import StoreCompany from './store-company';
+import IhsCompany from './ihs-company';
 import Member from './member';
 import User from './user';
 import UserLog from './user-log';
@@ -10,6 +12,8 @@ import Address from './address';
 
 export {
 	Store,
+	StoreCompany,
+	IhsCompany,
 	Member,
 	User,
 	UserLog,

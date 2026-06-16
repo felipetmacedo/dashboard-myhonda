@@ -1,6 +1,7 @@
 import BaseRoutes from './base';
 import { AuthSchema } from '@schemas';
 import { AuthController } from '@controllers';
+import { AuthMiddleware } from '@middlewares';
 
 class AuthRoutes extends BaseRoutes {
 	constructor() {
@@ -16,6 +17,8 @@ class AuthRoutes extends BaseRoutes {
 		this.router.post('/request-reset-password', this.SchemaValidator.validate(AuthSchema.requestResetPassword), this.authController.requestResetPassword);
 		this.router.get('/validate-reset-password', this.SchemaValidator.validate(AuthSchema.validateResetPassword), this.authController.validateResetPassword);
 		this.router.post('/reset-password', this.SchemaValidator.validate(AuthSchema.resetPassword), this.authController.resetPassword);
+		this.router.get('/session', AuthMiddleware.isAuthorized, this.authController.session);
+		this.router.put('/change-password', AuthMiddleware.isAuthorized, this.SchemaValidator.validate(AuthSchema.changePassword), this.authController.changePassword);
 
 		return this.router;
 	}

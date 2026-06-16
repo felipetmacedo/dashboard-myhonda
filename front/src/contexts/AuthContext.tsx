@@ -1,11 +1,13 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { AuthUser, LoginRequest, Loja } from '@/services/authTypes';
-import { loginUser } from '@/services/authApi';
+import { AuthUser, LoginRequest } from '@/services/authTypes';
+import { loginUser, fetchSession } from '@/services/authApi';
+
+const TOKEN_KEY = 'authToken';
+const USER_KEY = 'authUser';
 
 interface AuthContextType {
   user: AuthUser | null;
-  login: (credentials: LoginRequest) => Promise<boolean>;
+  login: (credentials: LoginRequest) => Promise<boolean | string>;
   logout: () => void;
   isLoading: boolean;
   getCodhdaList: () => string[];
@@ -29,42 +31,45 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Verificar se há um usuário salvo no localStorage
-    const savedUser = localStorage.getItem('authUser');
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Erro ao carregar usuário salvo:', error);
-        localStorage.removeItem('authUser');
-      }
+  const hydrateSession = useCallback(async (token: string): Promise<boolean> => {
+    try {
+      const session = await fetchSession(token);
+      const authUser: AuthUser = {
+        ...session.user,
+        permissions: session.permissions,
+        lojas: session.lojas,
+        codhdaList: session.codhdaList,
+        store: session.store,
+        token,
+        isAuthenticated: true,
+      };
+      setUser(authUser);
+      localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+      return true;
+    } catch {
+      return false;
     }
-    setIsLoading(false);
   }, []);
 
-  const login = async (credentials: LoginRequest): Promise<boolean> => {
+  useEffect(() => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) {
+      hydrateSession(token).finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
+    }
+  }, [hydrateSession]);
+
+  const login = async (credentials: LoginRequest): Promise<boolean | string> => {
     try {
       setIsLoading(true);
-      const response = await loginUser(credentials);
-      
-      if (response.retorno) {
-        const authUser: AuthUser = {
-          user: credentials.user,
-          lojas: response.lojas,
-          isAuthenticated: true,
-        };
-        
-        setUser(authUser);
-        localStorage.setItem('authUser', JSON.stringify(authUser));
-        return true;
-      } else {
-        throw new Error(response.message || 'Credenciais inválidas');
-      }
-    } catch (error) {
-      console.error('Erro no login:', error);
-      return false;
+      const { token } = await loginUser(credentials);
+      localStorage.setItem(TOKEN_KEY, token);
+      const ok = await hydrateSession(token);
+      if (!ok) return 'Erro ao carregar sessão. Tente novamente.';
+      return true;
+    } catch (error: any) {
+      return error?.message || false;
     } finally {
       setIsLoading(false);
     }
@@ -72,11 +77,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('authUser');
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
   };
 
   const getCodhdaList = useCallback((): string[] => {
-    return user?.lojas?.map(loja => loja.codhda) || [];
+    return user?.codhdaList || [];
   }, [user]);
 
   return (

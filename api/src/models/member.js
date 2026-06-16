@@ -15,13 +15,8 @@ export default class Member extends BaseModel {
 			},
 			creatorId: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
-				field: 'creator_id'
-			},
-			destroyerId: {
-				type: DataTypes.INTEGER,
 				allowNull: true,
-				field: 'destroyer_id'
+				field: 'creator_id'
 			},
 			isDeleted: {
 				type: DataTypes.BOOLEAN,
@@ -35,7 +30,7 @@ export default class Member extends BaseModel {
 			underscored: false,
 			sequelize: sequelize,
 			modelName: 'member',
-			tableName: 'members',
+			tableName: 'new_members',
 			createdAt: 'created_at',
 			updatedAt: 'updated_at',
 		});
