@@ -1,6 +1,6 @@
-# MyHonda SFS
+# SAGzap myHonda
 
-Plataforma de dashboards do produto **MyHonda SFS** (concessionária Honda). Monorepo com
+Plataforma de dashboards do produto **SAGzap myHonda** (concessionária Honda). Monorepo com
 API Express e frontend React/Vite, conectados ao banco MySQL `sfsea`.
 
 > Projeto derivado do dashboard Sagzap. As páginas e queries antigas foram removidas — esta base

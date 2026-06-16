@@ -164,7 +164,7 @@ const Dashboard = () => {
       <div className="p-6 space-y-6">
 
         {/* Header + filtros */}
-        <PageHeader title="Dashboard MyHonda SFS">
+        <PageHeader title="Dashboard SAGzap myHonda">
           <ReportQueryFilters
             dateRange={dateRange}
             onDateRangeChange={setDateRange}

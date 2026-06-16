@@ -1,6 +1,6 @@
-# MyHonda SFS — API
+# SAGzap myHonda — API
 
-API Express do MyHonda SFS. Node 20 + Babel + Sequelize (MySQL). Faz parte do monorepo
+API Express do SAGzap myHonda. Node 20 + Babel + Sequelize (MySQL). Faz parte do monorepo
 `dashboard-myhonda` — veja o README da raiz para deploy e visão geral.
 
 ## Rodar local

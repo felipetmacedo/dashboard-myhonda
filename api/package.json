@@ -2,7 +2,7 @@
   "name": "myhonda-sfs-api",
   "main": "index.js",
   "version": "1.0.0",
-  "description": "MyHonda SFS API",
+  "description": "SAGzap myHonda API",
   "author": "Felipe Torres <ftmacedo.torres@gmail.com>",
   "license": "MIT",
   "scripts": {

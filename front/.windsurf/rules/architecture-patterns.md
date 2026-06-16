@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Arquitetura — MyHonda SFS Frontend
+# Arquitetura — SAGzap myHonda Frontend
 
 ## Stack
 
@@ -35,7 +35,7 @@ trigger: always_on
 │  Services (src/services/)        │  [feature]Api.ts + [feature]Types.ts
 │  Utils (src/utils/)              │  apiConfig, puras
 ├──────────────────────────────────┤
-│  API Express (api/)              │  MyHonda SFS API em localhost:3000
+│  API Express (api/)              │  SAGzap myHonda API em localhost:3000
 └──────────────────────────────────┘
 ```
 

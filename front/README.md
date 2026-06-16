@@ -1,6 +1,6 @@
-# MyHonda SFS — Frontend
+# SAGzap myHonda — Frontend
 
-Frontend React/Vite do MyHonda SFS. Faz parte do monorepo `dashboard-myhonda` — veja o
+Frontend React/Vite do SAGzap myHonda. Faz parte do monorepo `dashboard-myhonda` — veja o
 [README da raiz](../README.md) para visão geral, deploy e padrões.
 
 ## Stack

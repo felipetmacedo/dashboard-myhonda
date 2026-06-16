@@ -15,7 +15,7 @@ export function Layout({ children }: LayoutProps) {
           {/* Mobile topbar — só visível em telas pequenas */}
           <header className="flex md:hidden items-center h-12 px-3 border-b bg-background shrink-0">
             <SidebarTrigger className="h-8 w-8" />
-            <span className="ml-3 text-sm font-semibold text-primary">MyHonda SFS</span>
+            <span className="ml-3 text-sm font-semibold text-primary">SAGzap myHonda</span>
           </header>
 
           <main className="flex-1 overflow-x-auto overflow-y-auto">

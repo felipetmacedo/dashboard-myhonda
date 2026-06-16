@@ -1,4 +1,4 @@
-# Regras para Agentes de IA — MyHonda SFS Frontend
+# Regras para Agentes de IA — SAGzap myHonda Frontend
 
 Instruções obrigatórias para qualquer agente que gerar ou editar código neste repositório.
 

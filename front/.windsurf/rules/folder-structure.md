@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Estrutura de Pastas — MyHonda SFS (monorepo)
+# Estrutura de Pastas — SAGzap myHonda (monorepo)
 
 ## Raiz do monorepo
 

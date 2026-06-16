@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Padrões de Código — MyHonda SFS Frontend
+# Padrões de Código — SAGzap myHonda Frontend
 
 ## Nomenclatura
 

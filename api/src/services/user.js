@@ -268,8 +268,8 @@ export default class UserService {
 			if (data.sendEmail !== false) {
 				const emailOptions = {
 					to: data.email,
-					subject: 'Bem-vindo ao MyHonda SFS - Suas Credenciais de Acesso',
-					text: 'Bem-vindo ao MyHonda SFS',
+					subject: 'Bem-vindo ao SAGzap myHonda - Suas Credenciais de Acesso',
+					text: 'Bem-vindo ao SAGzap myHonda',
 					html: EmailTemplates.getWelcomeEmailTemplate(user.name, data.email, password),
 				};
 				await this.emailService.send(emailOptions).catch(() => {});

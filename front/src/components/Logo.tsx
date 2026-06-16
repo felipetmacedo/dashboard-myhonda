@@ -13,7 +13,7 @@ const sizeClasses = {
   xl: "h-12 w-auto",
 };
 
-export const Logo = ({ className = "", size = "md", alt = "MyHonda SFS" }: LogoProps) => {
+export const Logo = ({ className = "", size = "md", alt = "SAGzap myHonda" }: LogoProps) => {
   const sizeClass = sizeClasses[size];
 
   return (

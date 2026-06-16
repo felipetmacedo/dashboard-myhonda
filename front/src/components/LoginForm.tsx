@@ -76,7 +76,7 @@ export const LoginForm = () => {
         <div className="relative z-10">
           <img
             src={logoMyHonda}
-            alt="MyHonda SFS"
+            alt="SAGzap myHonda"
             className="h-14 w-auto object-contain brightness-0 invert opacity-90"
           />
         </div>
@@ -84,8 +84,8 @@ export const LoginForm = () => {
         <div className="relative z-10 space-y-6">
           <div className="space-y-3">
             <h1 className="text-5xl font-black text-white leading-none tracking-tight">
-              MyHonda
-              <span className="block text-white/70">SFS</span>
+              SAGzap
+              <span className="block text-white/70">myHonda</span>
             </h1>
             <div className="w-16 h-1 bg-white/50 rounded-full" />
           </div>
@@ -96,7 +96,7 @@ export const LoginForm = () => {
 
         <div className="relative z-10">
           <p className="text-white/40 text-sm">
-            Sistema de Gestão Honda SFS
+            Sistema de Gestão SAGzap myHonda
           </p>
         </div>
       </div>
@@ -108,7 +108,7 @@ export const LoginForm = () => {
         <div className="lg:hidden mb-8">
           <img
             src={logoMyHonda}
-            alt="MyHonda SFS"
+            alt="SAGzap myHonda"
             className="h-12 w-auto mx-auto"
           />
         </div>
@@ -119,7 +119,7 @@ export const LoginForm = () => {
           <div className="space-y-1">
             <h2 className="text-2xl font-bold text-gray-900">Bem-vindo</h2>
             <p className="text-sm text-gray-500">
-              Faça login para acessar o MyHonda SFS
+              Faça login para acessar o SAGzap myHonda
             </p>
           </div>
 
@@ -182,7 +182,7 @@ export const LoginForm = () => {
 
           {/* Rodapé */}
           <p className="text-center text-xs text-gray-400">
-            MyHonda SFS — Sistema de Gestão
+            SAGzap myHonda — Sistema de Gestão
           </p>
         </div>
       </div>

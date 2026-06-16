@@ -1,7 +1,7 @@
 {
   "name": "dashboard-myhonda",
   "version": "1.0.0",
-  "description": "MyHonda SFS — monorepo (API Express + Frontend React/Vite)",
+  "description": "SAGzap myHonda — monorepo (API Express + Frontend React/Vite)",
   "private": true,
   "scripts": {
     "dev": "concurrently --names API,FRONT --prefix-colors red,cyan \"npm run dev:api\" \"npm run dev:front\"",

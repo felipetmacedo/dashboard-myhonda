@@ -1,6 +1,6 @@
-# MyHonda SFS — Guia de Desenvolvimento
+# SAGzap myHonda — Guia de Desenvolvimento
 
-Monorepo do produto **MyHonda SFS** (dashboards da concessionária Honda). Derivado do dashboard
+Monorepo do produto **SAGzap myHonda** (dashboards da concessionária Honda). Derivado do dashboard
 Sagzap, com as páginas/queries antigas removidas — restou só o esqueleto reutilizável.
 
 ## Estrutura

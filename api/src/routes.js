@@ -41,7 +41,7 @@ class Routes {
 
 		this.openapi = buildOpenApiSpec({
 			mounts,
-			title: 'MyHonda SFS API',
+			title: 'SAGzap myHonda API',
 			version: process.env.npm_package_version || '1.0.0'
 		});
 

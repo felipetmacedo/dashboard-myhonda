@@ -66,16 +66,6 @@ export function DateRangePicker({
   const [open, setOpen] = React.useState(false)
   const presetRanges = getPresetRanges()
 
-  React.useEffect(() => {
-    if (value) {
-      setDate(value)
-    } else {
-      const currentMonth = getCurrentMonthRange()
-      setDate(currentMonth)
-      onChange?.(currentMonth)
-    }
-  }, [value, onChange])
-
   const handleCalendarSelect = (range: DateRange | undefined) => {
     setDate(range)
     if (range?.from && range?.to) {

@@ -2,11 +2,11 @@
 trigger: always_on
 ---
 
-# Documentação do Projeto Dashboard MyHonda SFS
+# Documentação do Projeto Dashboard SAGzap myHonda
 
 ## 📚 Visão Geral
 
-Este diretório contém a documentação completa do projeto Dashboard MyHonda SFS, um sistema de dashboards analíticos desenvolvido com React, TypeScript e Tailwind CSS.
+Este diretório contém a documentação completa do projeto Dashboard SAGzap myHonda, um sistema de dashboards analíticos desenvolvido com React, TypeScript e Tailwind CSS.
 
 ## 📖 Documentos Disponíveis
 

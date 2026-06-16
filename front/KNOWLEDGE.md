@@ -1,4 +1,4 @@
-# Knowledge Base — Dashboard MyHonda SFS
+# Knowledge Base — Dashboard SAGzap myHonda
 
 > Referência completa de padrões, arquitetura e melhores práticas deste repositório.  
 > Leia este documento antes de criar ou editar qualquer componente.

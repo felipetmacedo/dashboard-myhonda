@@ -84,8 +84,8 @@ export function AppSidebar() {
           <div className="flex items-center space-x-3">
             <Logo size="md" className="flex-shrink-0" />
             <div>
-              <h2 className="text-lg font-bold text-primary">MyHonda SFS</h2>
-              <p className="text-xs text-muted-foreground">SFS</p>
+              <h2 className="text-lg font-bold text-primary">SAGzap myHonda</h2>
+              <p className="text-xs text-muted-foreground">myHonda</p>
             </div>
           </div>
           <Button

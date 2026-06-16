@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Guia de Componentes - Dashboard MyHonda SFS
+# Guia de Componentes - Dashboard SAGzap myHonda
 
 ## 📋 Índice
 1. [Tipos de Componentes](#tipos-de-componentes)
