@@ -26,6 +26,7 @@ export default class ReportsService {
 					WHEN LOCATE('HAB', ihs_myhonda_integracao.TIPO) > 0 THEN 'HAB'
 					WHEN LOCATE('CS ', ihs_myhonda_integracao.TIPO) > 0 THEN 'CS '
 				END AS TIPO,
+				ihs_myhonda_integracao.lead,
 				ihs_myhonda_integracao.PRODUTO,
 				ihs_myhonda_integracao.CPF,
 				ihs_myhonda_integracao.CELULAR,
@@ -39,7 +40,6 @@ export default class ReportsService {
 				ihs_myhonda_integracao.MSG_ENCAMINHADA,
 				ihs_myhonda_integracao.DATA_CADASTRO,
 				ihs_myhonda_integracao.QTD_TENTATIVAS,
-				ihs_myhonda_integracao.lead,
 				ihs_myhonda_integracao.perfil,
 				ihs_myhonda_integracao.idade,
 				ihs_myhonda_integracao.folga_orcamentaria,
@@ -74,6 +74,11 @@ export default class ReportsService {
 				END IN ('HDA', 'CNH', 'HSF', 'SHB', 'BHB', 'HAB', 'CS '))
 				AND (ihs_myhonda_integracao.data_criacao_lead BETWEEN :dataInicio AND :dataFinal)
 				AND (ihs_myhonda_integracao.CODHDA IN (:codhda))
+			GROUP BY
+				ihs_myhonda_integracao.CODHDA,
+				ihs_myhonda_integracao.CPF,
+				ihs_myhonda_integracao.CELULAR,
+				Cast(ihs_myhonda_integracao.data_criacao_lead As DATE)
 			ORDER BY
 				ihs_myhonda_integracao.ID DESC
 		`;

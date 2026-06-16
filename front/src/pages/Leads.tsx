@@ -63,6 +63,7 @@ const Leads = () => {
   } = useReportQueryFilters();
 
   const [slaFilter, setSlaFilter] = useState<null | "0-5" | "6-30" | ">30">(null);
+  const [crmFilter, setCrmFilter] = useState<null | "enviado" | "nao-enviado">(null);
 
   const { data = [], isFetching, isError, error } = useQuery({
     queryKey: ["leads", activeParams],
@@ -82,16 +83,29 @@ const Leads = () => {
     return counts;
   }, [data]);
 
-  const filteredData = useMemo(() => {
-    if (!slaFilter) return data;
-    return data.filter(l => {
-      const m = l.sla_minutos;
-      if (m === null || m === undefined || m < 0) return false;
-      if (slaFilter === "0-5")  return m <= 5;
-      if (slaFilter === "6-30") return m >= 6 && m <= 30;
-      return m > 30;
+  const crmCounts = useMemo(() => {
+    const counts = { enviado: 0, "nao-enviado": 0 };
+    data.forEach(l => {
+      if (l.RETORNO_ENCAMINHAMENTO) counts.enviado++;
+      else counts["nao-enviado"]++;
     });
-  }, [data, slaFilter]);
+    return counts;
+  }, [data]);
+
+  const filteredData = useMemo(() => {
+    return data.filter(l => {
+      if (slaFilter) {
+        const m = l.sla_minutos;
+        if (m === null || m === undefined || m < 0) return false;
+        if (slaFilter === "0-5"  && !(m <= 5)) return false;
+        if (slaFilter === "6-30" && !(m >= 6 && m <= 30)) return false;
+        if (slaFilter === ">30"  && !(m > 30)) return false;
+      }
+      if (crmFilter === "enviado" && !l.RETORNO_ENCAMINHAMENTO) return false;
+      if (crmFilter === "nao-enviado" && l.RETORNO_ENCAMINHAMENTO) return false;
+      return true;
+    });
+  }, [data, slaFilter, crmFilter]);
 
   const columns = useMemo<ColumnDef<Lead>[]>(() => [
     // — visíveis por padrão (mais relevantes primeiro) —
@@ -307,6 +321,33 @@ const Leads = () => {
             {slaFilter && (
               <button
                 onClick={() => setSlaFilter(null)}
+                className="text-xs text-muted-foreground underline hover:text-foreground"
+              >
+                limpar
+              </button>
+            )}
+          </div>
+        )}
+
+        {data.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-muted-foreground font-medium">Filtrar por CRM:</span>
+            {([
+              { key: "enviado",     label: "Enviado ao CRM",     count: crmCounts.enviado,       cls: "border-green-300 text-green-700 bg-green-50 hover:bg-green-100" },
+              { key: "nao-enviado", label: "Não enviado ao CRM", count: crmCounts["nao-enviado"], cls: "border-red-300 text-red-700 bg-red-50 hover:bg-red-100"         },
+            ] as const).map(({ key, label, count, cls }) => (
+              <button
+                key={key}
+                onClick={() => setCrmFilter(crmFilter === key ? null : key)}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-all cursor-pointer ${cls} ${crmFilter === key ? "ring-2 ring-offset-1 ring-current" : "opacity-80"}`}
+              >
+                {label}
+                <span className="font-bold">{count}</span>
+              </button>
+            ))}
+            {crmFilter && (
+              <button
+                onClick={() => setCrmFilter(null)}
                 className="text-xs text-muted-foreground underline hover:text-foreground"
               >
                 limpar
