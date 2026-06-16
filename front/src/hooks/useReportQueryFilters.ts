@@ -9,14 +9,6 @@ import {
   getCurrentMonthDateRange,
 } from "@/utils/reportDateRange";
 
-function parseCodhdaCsv(text: string): string {
-  return text
-    .split(",")
-    .map((c) => c.trim())
-    .filter(Boolean)
-    .join(",");
-}
-
 interface UseReportQueryFiltersOptions {
   /** Dispara a primeira consulta quando as lojas do usuário estiverem disponíveis. */
   autoApplyOnStoresReady?: boolean;
@@ -30,7 +22,6 @@ export function useReportQueryFilters(options: UseReportQueryFiltersOptions = {}
 
   const [dateRange, setDateRange] = useState<DateRange>(getCurrentMonthDateRange);
   const [selectedCodhdas, setSelectedCodhdas] = useState<string[]>([]);
-  const [codhdaText, setCodhdaText] = useState("");
   const [activeParams, setActiveParams] = useState<LeadsRequest | null>(null);
   const didAutoApplyRef = useRef(false);
 
@@ -47,17 +38,12 @@ export function useReportQueryFilters(options: UseReportQueryFiltersOptions = {}
 
   useEffect(() => {
     if (!user?.lojas?.length) return;
-    const codhdas = user.lojas.map((l) => l.codhda);
-    setSelectedCodhdas(codhdas);
-    if (isAdministrador) {
-      setCodhdaText(codhdas.join(", "));
-    }
-  }, [user?.lojas, isAdministrador]);
+    setSelectedCodhdas(user.lojas.map((l) => l.codhda));
+  }, [user?.lojas]);
 
   const resolveCodhdaCsv = useCallback((): string => {
-    if (isAdministrador) return parseCodhdaCsv(codhdaText);
     return selectedCodhdas.join(",");
-  }, [isAdministrador, codhdaText, selectedCodhdas]);
+  }, [selectedCodhdas]);
 
   const buildParams = useCallback((): LeadsRequest | null => {
     const codhda = resolveCodhdaCsv();
@@ -75,24 +61,19 @@ export function useReportQueryFilters(options: UseReportQueryFiltersOptions = {}
 
   const hasStores = lojaOptions.length > 0;
 
-  const canAutoApply = isAdministrador
-    ? parseCodhdaCsv(codhdaText).length > 0
-    : selectedCodhdas.length > 0;
+  const canAutoApply = selectedCodhdas.length > 0;
+
+  const buildParamsRef = useRef(buildParams);
+  buildParamsRef.current = buildParams;
 
   useEffect(() => {
-    if (
-      !autoApplyOnStoresReady ||
-      didAutoApplyRef.current ||
-      !canAutoApply
-    ) {
-      return;
-    }
-    const params = buildParams();
+    if (!autoApplyOnStoresReady || didAutoApplyRef.current || !canAutoApply) return;
+    const params = buildParamsRef.current();
     if (params) {
       setActiveParams(params);
       didAutoApplyRef.current = true;
     }
-  }, [autoApplyOnStoresReady, canAutoApply, buildParams]);
+  }, [autoApplyOnStoresReady, canAutoApply]);
 
   const periodLabel = useMemo(
     () => formatPeriodLabel(dateRange),
@@ -106,8 +87,6 @@ export function useReportQueryFilters(options: UseReportQueryFiltersOptions = {}
     setDateRange,
     selectedCodhdas,
     setSelectedCodhdas,
-    codhdaText,
-    setCodhdaText,
     lojaOptions,
     hasStores,
     isAdministrador,

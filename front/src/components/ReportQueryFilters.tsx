@@ -3,8 +3,6 @@ import { DateRangePicker } from "@/components/DateRangePicker";
 import { MultiSelectCombobox, MultiSelectOption } from "@/components/ui/multi-select-combobox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/contexts/AuthContext";
 
 export interface ReportQueryFiltersProps {
   dateRange: DateRange | undefined;
@@ -12,8 +10,6 @@ export interface ReportQueryFiltersProps {
   lojaOptions: MultiSelectOption[];
   selectedCodhdas: string[];
   onSelectedCodhdasChange: (values: string[]) => void;
-  codhdaText: string;
-  onCodhdaTextChange: (value: string) => void;
   onConsultar: () => void;
   isLoading?: boolean;
 }
@@ -28,17 +24,10 @@ export function ReportQueryFilters({
   lojaOptions,
   selectedCodhdas,
   onSelectedCodhdasChange,
-  codhdaText,
-  onCodhdaTextChange,
   onConsultar,
   isLoading = false,
 }: ReportQueryFiltersProps) {
-  const { user } = useAuth();
-  const isAdministrador = user?.user === "ADMINISTRADOR";
-
-  const hasCodhda = isAdministrador
-    ? codhdaText.split(",").some((c) => c.trim())
-    : selectedCodhdas.length > 0;
+  const hasCodhda = selectedCodhdas.length > 0;
 
   const periodReady = !!(dateRange?.from && dateRange?.to);
 
@@ -54,23 +43,14 @@ export function ReportQueryFilters({
 
       <div className="space-y-1.5 min-w-0">
         <Label>Empresas (CODHDA)</Label>
-        {isAdministrador ? (
-          <Textarea
-            placeholder="Códigos CODHDA separados por vírgula"
-            value={codhdaText}
-            onChange={(e) => onCodhdaTextChange(e.target.value)}
-            className="min-h-[60px]"
-          />
-        ) : (
-          <MultiSelectCombobox
-            options={lojaOptions}
-            selected={selectedCodhdas}
-            onChange={onSelectedCodhdasChange}
-            placeholder="Selecione as empresas"
-            searchPlaceholder="Buscar empresa..."
-            emptyMessage="Nenhuma loja disponível."
-          />
-        )}
+        <MultiSelectCombobox
+          options={lojaOptions}
+          selected={selectedCodhdas}
+          onChange={onSelectedCodhdasChange}
+          placeholder="Selecione as empresas"
+          searchPlaceholder="Buscar empresa..."
+          emptyMessage="Nenhuma loja disponível."
+        />
       </div>
 
       <Button

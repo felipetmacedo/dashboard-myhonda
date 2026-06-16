@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { format, isValid, parseISO } from "date-fns";
@@ -57,18 +57,41 @@ const Leads = () => {
     setDateRange,
     selectedCodhdas,
     setSelectedCodhdas,
-    codhdaText,
-    setCodhdaText,
     lojaOptions,
     hasStores,
     isAdministrador,
   } = useReportQueryFilters();
+
+  const [slaFilter, setSlaFilter] = useState<null | "0-5" | "6-30" | ">30">(null);
 
   const { data = [], isFetching, isError, error } = useQuery({
     queryKey: ["leads", activeParams],
     queryFn: () => fetchLeads(activeParams!),
     enabled: !!activeParams,
   });
+
+  const slaCounts = useMemo(() => {
+    const counts = { "0-5": 0, "6-30": 0, ">30": 0 };
+    data.forEach(l => {
+      const m = l.sla_minutos;
+      if (m === null || m === undefined || m < 0) return;
+      if (m <= 5) counts["0-5"]++;
+      else if (m <= 30) counts["6-30"]++;
+      else counts[">30"]++;
+    });
+    return counts;
+  }, [data]);
+
+  const filteredData = useMemo(() => {
+    if (!slaFilter) return data;
+    return data.filter(l => {
+      const m = l.sla_minutos;
+      if (m === null || m === undefined || m < 0) return false;
+      if (slaFilter === "0-5")  return m <= 5;
+      if (slaFilter === "6-30") return m >= 6 && m <= 30;
+      return m > 30;
+    });
+  }, [data, slaFilter]);
 
   const columns = useMemo<ColumnDef<Lead>[]>(() => [
     // — visíveis por padrão (mais relevantes primeiro) —
@@ -180,7 +203,7 @@ const Leads = () => {
     resetColumnOrder,
     handleColumnDrop,
   } = useAdvancedTable({
-    data,
+    data: filteredData,
     columns,
     tableId: "leads",
     initialPageSize: 50,
@@ -240,8 +263,6 @@ const Leads = () => {
             lojaOptions={lojaOptions}
             selectedCodhdas={selectedCodhdas}
             onSelectedCodhdasChange={setSelectedCodhdas}
-            codhdaText={codhdaText}
-            onCodhdaTextChange={setCodhdaText}
             onConsultar={applyFilters}
             isLoading={isFetching}
           />
@@ -263,6 +284,34 @@ const Leads = () => {
           <div className="flex items-center justify-center py-16 gap-2 text-muted-foreground text-sm">
             <Loader2 className="h-5 w-5 animate-spin" />
             Carregando leads...
+          </div>
+        )}
+
+        {data.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-muted-foreground font-medium">Filtrar por SLA:</span>
+            {([
+              { key: "0-5",  label: "0–5 min",  count: slaCounts["0-5"],  cls: "border-green-300 text-green-700 bg-green-50 hover:bg-green-100" },
+              { key: "6-30", label: "6–30 min", count: slaCounts["6-30"], cls: "border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100" },
+              { key: ">30",  label: ">30 min",  count: slaCounts[">30"],  cls: "border-red-300 text-red-700 bg-red-50 hover:bg-red-100"       },
+            ] as const).map(({ key, label, count, cls }) => (
+              <button
+                key={key}
+                onClick={() => setSlaFilter(slaFilter === key ? null : key)}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-all cursor-pointer ${cls} ${slaFilter === key ? "ring-2 ring-offset-1 ring-current" : "opacity-80"}`}
+              >
+                {label}
+                <span className="font-bold">{count}</span>
+              </button>
+            ))}
+            {slaFilter && (
+              <button
+                onClick={() => setSlaFilter(null)}
+                className="text-xs text-muted-foreground underline hover:text-foreground"
+              >
+                limpar
+              </button>
+            )}
           </div>
         )}
 

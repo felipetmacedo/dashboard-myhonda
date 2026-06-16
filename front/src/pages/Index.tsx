@@ -67,8 +67,6 @@ const Dashboard = () => {
     setDateRange,
     selectedCodhdas,
     setSelectedCodhdas,
-    codhdaText,
-    setCodhdaText,
     lojaOptions,
     periodLabel,
   } = useReportQueryFilters();
@@ -129,6 +127,23 @@ const Dashboard = () => {
       .map(([name, value]) => ({ name, value }));
   }, [data]);
 
+  // ── Distribuição SLA ──────────────────────────────────────────────
+  const bySla = useMemo(() => {
+    const buckets = { "0–5 min": 0, "6–30 min": 0, ">30 min": 0 };
+    data.forEach(l => {
+      const m = l.sla_minutos;
+      if (m === null || m === undefined || m < 0) return;
+      if (m <= 5) buckets["0–5 min"]++;
+      else if (m <= 30) buckets["6–30 min"]++;
+      else buckets[">30 min"]++;
+    });
+    return [
+      { faixa: "0–5 min",   total: buckets["0–5 min"],   fill: "#ff9999" },
+      { faixa: "6–30 min",  total: buckets["6–30 min"],  fill: "#e84040" },
+      { faixa: ">30 min",   total: buckets[">30 min"],   fill: "#8b0000" },
+    ];
+  }, [data]);
+
   // ── Sub-Origem (mais granular que ORIGEM, sempre "Website Honda") ──
   const bySubOrigem = useMemo(() => {
     const map = new Map<string, number>();
@@ -156,8 +171,6 @@ const Dashboard = () => {
             lojaOptions={lojaOptions}
             selectedCodhdas={selectedCodhdas}
             onSelectedCodhdasChange={setSelectedCodhdas}
-            codhdaText={codhdaText}
-            onCodhdaTextChange={setCodhdaText}
             onConsultar={applyFilters}
             isLoading={isFetching}
           />
@@ -179,7 +192,7 @@ const Dashboard = () => {
         {!isLoading && (
           <>
             {/* KPI Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               <KpiCard
                 title="Total de Leads"
                 value={kpis.total.toLocaleString("pt-BR")}
@@ -198,13 +211,6 @@ const Dashboard = () => {
                 value={kpis.novos.toLocaleString("pt-BR")}
                 icon={<Sparkles className="h-5 w-5" />}
                 sub="sem tentativa (QTD = 0)"
-              />
-              <KpiCard
-                title="Em Limite de Tentativas"
-                value={kpis.limite.toLocaleString("pt-BR")}
-                icon={<AlertTriangle className="h-5 w-5" />}
-                sub="QTD_TENTATIVAS ≥ 9 — atenção"
-                warn={kpis.limite > 0}
               />
             </div>
 
@@ -350,6 +356,53 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
+            {/* SLA */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Distribuição por SLA (tempo de atendimento)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {bySla.every(b => b.total === 0) ? (
+                  <p className="text-muted-foreground text-sm text-center py-8">Sem dados</p>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <ResponsiveContainer width="55%" height={220}>
+                      <PieChart>
+                        <Pie
+                          data={bySla}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={55}
+                          outerRadius={90}
+                          paddingAngle={2}
+                          dataKey="total"
+                          nameKey="faixa"
+                        >
+                          {bySla.map((entry) => (
+                            <Cell key={entry.faixa} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(v: number) => [v, "Leads"]} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="flex flex-col gap-2 flex-1">
+                      {bySla.map(entry => (
+                        <div key={entry.faixa} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-3 h-3 rounded-sm flex-shrink-0"
+                              style={{ backgroundColor: entry.fill }}
+                            />
+                            <span className="font-medium">{entry.faixa}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">{entry.total}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </>
         )}
       </div>
