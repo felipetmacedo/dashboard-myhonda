@@ -17,8 +17,8 @@
     },
     {
       "name": "api",
-      "runtimeExecutable": "yarn",
-      "runtimeArgs": ["--cwd", "api", "start:dev"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "api", "run", "dev"],
       "port": 3000
     }
   ]

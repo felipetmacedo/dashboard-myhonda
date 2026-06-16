@@ -50,7 +50,16 @@ export default class ReportsService {
 				ihs_myhonda_integracao.versao,
 				ihs_myhonda_integracao.ano_modelo,
 				ihs_myhonda_integracao.tipo_servico,
-				TIMESTAMPDIFF(MINUTE, ihs_myhonda_integracao.data_criacao_lead, ihs_myhonda_integracao.DATA_CADASTRO) AS sla_minutos
+				TIMESTAMPDIFF(MINUTE,
+					ihs_myhonda_integracao.data_criacao_lead,
+					IF(
+						TIME(ihs_myhonda_integracao.data_criacao_lead) < '08:00:00'
+						OR TIME(ihs_myhonda_integracao.data_criacao_lead) >= '18:00:00'
+						OR WEEKDAY(ihs_myhonda_integracao.data_criacao_lead) >= 5,
+						ihs_myhonda_integracao.data_criacao_lead,
+						ihs_myhonda_integracao.DATA_CADASTRO
+					)
+				) AS sla_minutos
 			FROM
 				ihs_myhonda_integracao
 			WHERE
@@ -65,13 +74,6 @@ export default class ReportsService {
 				END IN ('HDA', 'CNH', 'HSF', 'SHB', 'BHB', 'HAB', 'CS '))
 				AND (ihs_myhonda_integracao.data_criacao_lead BETWEEN :dataInicio AND :dataFinal)
 				AND (ihs_myhonda_integracao.CODHDA IN (:codhda))
-			GROUP BY
-				ihs_myhonda_integracao.CODHDA,
-				ihs_myhonda_integracao.NOME,
-				ihs_myhonda_integracao.TIPO,
-				ihs_myhonda_integracao.PRODUTO,
-				ihs_myhonda_integracao.CPF,
-				CAST(ihs_myhonda_integracao.data_criacao_lead AS DATE)
 			ORDER BY
 				ihs_myhonda_integracao.ID DESC
 		`;
@@ -79,6 +81,7 @@ export default class ReportsService {
 		return this.database.masterInstance.query(query, {
 			replacements: { dataInicio, dataFinal, codhda: codhdaArray },
 			type: QueryTypes.SELECT,
+			timeout: 30000,
 		});
 	}
 }

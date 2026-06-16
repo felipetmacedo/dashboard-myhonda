@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently --names API,FRONT --prefix-colors red,cyan \"npm run dev:api\" \"npm run dev:front\"",
-    "dev:api": "cd api && yarn start:dev",
+    "dev:api": "npm --prefix api run dev",
     "dev:front": "cd front && npm run dev",
     "build": "npm run build:api && npm run build:front",
     "build:api": "cd api && yarn build",
