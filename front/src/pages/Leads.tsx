@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useTransition, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { format, isValid, parseISO } from "date-fns";
@@ -64,6 +64,8 @@ const Leads = () => {
 
   const [slaFilter, setSlaFilter] = useState<null | "0-5" | "6-30" | ">30">(null);
   const [crmFilter, setCrmFilter] = useState<null | "enviado" | "nao-enviado">(null);
+  const [, startTransition] = useTransition();
+  const [tableData, setTableData] = useState<Lead[]>([]);
 
   const { data = [], isFetching, isError, error } = useQuery({
     queryKey: ["leads", activeParams],
@@ -106,6 +108,10 @@ const Leads = () => {
       return true;
     });
   }, [data, slaFilter, crmFilter]);
+
+  useEffect(() => {
+    startTransition(() => setTableData(filteredData));
+  }, [filteredData]);
 
   const columns = useMemo<ColumnDef<Lead>[]>(() => [
     // — visíveis por padrão (mais relevantes primeiro) —
@@ -217,11 +223,12 @@ const Leads = () => {
     resetColumnOrder,
     handleColumnDrop,
   } = useAdvancedTable({
-    data: filteredData,
+    data: tableData,
     columns,
     tableId: "leads",
     initialPageSize: 50,
     initialColumnVisibility: HIDDEN_COLUMNS,
+    enableFacetedFilters: false,
   });
 
   const exportToExcel = useCallback(() => {

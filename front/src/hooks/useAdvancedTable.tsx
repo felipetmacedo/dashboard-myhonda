@@ -36,6 +36,8 @@ export interface UseAdvancedTableOptions<TData> {
   enableRowSelection?: boolean;
   /** Unique ID for persisting column order in localStorage */
   tableId?: string;
+  /** Enable faceted row models (getFacetedRowModel/UniqueValues/MinMaxValues). Default: false. */
+  enableFacetedFilters?: boolean;
 }
 
 export interface UseAdvancedTableReturn<TData> {
@@ -66,6 +68,7 @@ export function useAdvancedTable<TData>({
   initialColumnOrder,
   enableRowSelection = false,
   tableId,
+  enableFacetedFilters = false,
 }: UseAdvancedTableOptions<TData>): UseAdvancedTableReturn<TData> {
   const [sorting, setSorting] = useState<SortingState>(initialSorting);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -129,9 +132,11 @@ export function useAdvancedTable<TData>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    ...(enableFacetedFilters ? {
+      getFacetedRowModel: getFacetedRowModel(),
+      getFacetedUniqueValues: getFacetedUniqueValues(),
+      getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    } : {}),
     initialState: {
       pagination: { pageSize: initialPageSize },
     },

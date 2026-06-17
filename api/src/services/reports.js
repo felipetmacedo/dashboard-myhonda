@@ -72,7 +72,8 @@ export default class ReportsService {
 					WHEN LOCATE('HAB', ihs_myhonda_integracao.TIPO) > 0 THEN 'HAB'
 					WHEN LOCATE('CS ', ihs_myhonda_integracao.TIPO) > 0 THEN 'CS '
 				END IN ('HDA', 'CNH', 'HSF', 'SHB', 'BHB', 'HAB', 'CS '))
-				AND (DATE(ihs_myhonda_integracao.data_criacao_lead) BETWEEN :dataInicio AND :dataFinal)
+				AND (ihs_myhonda_integracao.data_criacao_lead >= :dataInicio
+					AND ihs_myhonda_integracao.data_criacao_lead < DATE_ADD(:dataFinal, INTERVAL 1 DAY))
 				AND (ihs_myhonda_integracao.CODHDA IN (:codhda))
 			GROUP BY
 				ihs_myhonda_integracao.CODHDA,

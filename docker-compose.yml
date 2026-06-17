@@ -12,7 +12,7 @@ services:
       SFSEA_DB_PASSWORD: ${SFSEA_DB_PASSWORD}
       SFSEA_DB_HOST: ${SFSEA_DB_HOST}
       SFSEA_DB_PORT: ${SFSEA_DB_PORT:-3306}
-      APP_SECRET_KEY: ${APP_SECRET_KEY}
+      APP_SECRET_KEY: ${APP_SECRET_KEY:-1a96aff28467dfb373948ffd43b70d9aabeb258ee624922f8585cfdc3dcc4b2bd176075d072887eadc6efa7a98d8d2cb}
     networks:
       - sagzap
     deploy:
