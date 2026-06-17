@@ -18,6 +18,14 @@ import {
 } from "@tanstack/react-table";
 import { normalizeFilterValue } from "@/components/AdvancedTableComponents";
 
+const DEFAULT_COLUMN_DEF = {
+  filterFn: (row: any, columnId: string, filterValue: string[]) => {
+    if (!filterValue?.length) return true;
+    const cell = normalizeFilterValue(row.getValue(columnId));
+    return filterValue.includes(cell);
+  },
+};
+
 export interface UseAdvancedTableOptions<TData> {
   data: TData[];
   columns: ColumnDef<TData, any>[];
@@ -99,15 +107,7 @@ export function useAdvancedTable<TData>({
   const table = useReactTable({
     data,
     columns,
-    defaultColumn: {
-      // Normaliza valores (trim + collapse whitespace + uppercase) antes de comparar,
-      // evitando que "NORMAL" e "NORMAL    " contem como valores distintos no filtro.
-      filterFn: ((row, columnId, filterValue: string[]) => {
-        if (!filterValue?.length) return true;
-        const cell = normalizeFilterValue(row.getValue(columnId));
-        return filterValue.includes(cell);
-      }) as any,
-    },
+    defaultColumn: DEFAULT_COLUMN_DEF,
     state: {
       sorting,
       columnFilters,

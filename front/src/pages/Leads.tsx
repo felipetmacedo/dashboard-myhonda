@@ -385,6 +385,7 @@ const Leads = () => {
                 <AdvancedTableHeader
                   table={table}
                   onColumnDrop={handleColumnDrop}
+                  enableFacetedFilter={false}
                 />
                 <AdvancedTableBody
                   table={table}
