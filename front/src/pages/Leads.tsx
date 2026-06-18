@@ -224,7 +224,7 @@ const Leads = () => {
   } = useAdvancedTable({
     data: tableData,
     columns,
-    tableId: "leads",
+    tableId: "leads-v2",
     initialPageSize: 10,
     initialColumnVisibility: HIDDEN_COLUMNS,
     enableFacetedFilters: false,
