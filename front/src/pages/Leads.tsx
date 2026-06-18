@@ -114,6 +114,7 @@ const Leads = () => {
 
   const columns = useMemo<ColumnDef<Lead>[]>(() => [
     // — visíveis por padrão (mais relevantes primeiro) —
+    { accessorKey: "CODHDA", header: "CODHDA", size: 90 },
     {
       accessorKey: "data_criacao_lead",
       header: "Data do Lead",
@@ -195,7 +196,6 @@ const Leads = () => {
     },
     // — ocultas por padrão (detalhes / integração) —
     { accessorKey: "ID", header: "ID" },
-    { accessorKey: "CODHDA", header: "CODHDA" },
     { accessorKey: "FONE", header: "Telefone fixo" },
     { accessorKey: "tipo_original", header: "Tipo original" },
     { accessorKey: "lead", header: "Lead (texto)" },
