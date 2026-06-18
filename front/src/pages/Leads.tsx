@@ -226,7 +226,7 @@ const Leads = () => {
     data: tableData,
     columns,
     tableId: "leads",
-    initialPageSize: 50,
+    initialPageSize: 10,
     initialColumnVisibility: HIDDEN_COLUMNS,
     enableFacetedFilters: false,
   });
