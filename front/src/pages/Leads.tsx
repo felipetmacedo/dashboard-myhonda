@@ -32,7 +32,6 @@ function formatLeadDateTime(value: string | null | undefined): string {
 
 const HIDDEN_COLUMNS: Record<string, boolean> = {
   ID: false,
-  CODHDA: false,
   FONE: false,
   JSON_MYHONDA: false,
   RETORNO_ENCAMINHAMENTO: false,
