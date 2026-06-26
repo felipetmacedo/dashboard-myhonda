@@ -171,7 +171,6 @@ export default class StoreService {
 
 	async listCompanies() {
 		return IhsCompany.findAll({
-			where: { ativa: 1 },
 			attributes: ['ihscompany_id', 'codhda', 'empresa', 'sigla_loja', 'cnpj', 'ihscompany_name'],
 			order: [['empresa', 'ASC']],
 			raw: true,
