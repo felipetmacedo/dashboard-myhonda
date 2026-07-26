@@ -104,6 +104,19 @@ export const createUser = async (data: {
   return unwrap(res);
 };
 
+export const updateUser = async (id: number, data: {
+  name: string;
+  email: string;
+  phone_number?: string;
+  system?: string;
+}): Promise<UserItem> => {
+  const res = await apiFetch(`${API_BASE_URL}/user/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+  return unwrap(res);
+};
+
 export const deleteUser = async (id: number): Promise<void> => {
   const res = await apiFetch(`${API_BASE_URL}/user/${id}`, { method: 'DELETE' });
   return unwrap(res);

@@ -337,13 +337,16 @@ export default class UserService {
 		const transaction = await this.database.masterInstance.transaction();
 
 		try {
+			const updateFields = {
+				name: data.name,
+				email: data.email,
+				document: data.document,
+				phone_number: data.phone_number,
+			};
+			if (data.system) updateFields.system = data.system;
+
 			await User.update(
-				{
-					name: data.name,
-					email: data.email,
-					document: data.document,
-					phone_number: data.phone_number,
-				},
+				updateFields,
 				{ where: { id, isDeleted: false }, transaction }
 			);
 

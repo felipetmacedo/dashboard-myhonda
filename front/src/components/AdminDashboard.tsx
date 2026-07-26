@@ -20,7 +20,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import {
   fetchStores, fetchCompanies, createStore, updateStore, deleteStore,
-  fetchUsers, createUser, deleteUser,
+  fetchUsers, createUser, updateUser, deleteUser,
   fetchUserPermissions, updateUserPermissions, fetchPermissionModules,
   resetUserPassword,
   type UserItem, type StoreItem, type CompanyItem,
@@ -423,12 +423,93 @@ const PermissionsModal = ({ user, open, onClose }: { user: UserItem | null; open
   );
 };
 
+// ─── Edit User Modal ──────────────────────────────────────────────────────────
+
+const EditUserModal = ({ user, open, onClose }: { user: UserItem | null; open: boolean; onClose: () => void }) => {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const [form, setForm] = useState({ name: "", email: "", phone_number: "", system: "myhonda" });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        name: user.name,
+        email: user.email,
+        phone_number: user.phone_number ?? "",
+        system: user.system ?? "myhonda",
+      });
+    }
+  }, [user, open]);
+
+  const handleSave = async () => {
+    if (!user || !form.name || !form.email) return;
+    setSaving(true);
+    try {
+      await updateUser(user.id, {
+        name: form.name,
+        email: form.email,
+        phone_number: form.phone_number || undefined,
+        system: form.system,
+      });
+      toast({ title: "Usuário atualizado!" });
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      onClose();
+    } catch (e: any) {
+      toast({ title: "Erro ao atualizar usuário", description: e.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader><DialogTitle>Editar Usuário</DialogTitle></DialogHeader>
+        <div className="space-y-3 py-2">
+          <div>
+            <Label>Nome *</Label>
+            <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Nome completo" disabled={saving} />
+          </div>
+          <div>
+            <Label>E-mail *</Label>
+            <Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@exemplo.com" disabled={saving} />
+          </div>
+          <div>
+            <Label>Telefone</Label>
+            <Input value={form.phone_number} onChange={e => setForm(f => ({ ...f, phone_number: e.target.value }))} placeholder="(11) 99999-9999" disabled={saving} />
+          </div>
+          <div>
+            <Label>Sistema *</Label>
+            <Select value={form.system} onValueChange={v => setForm(f => ({ ...f, system: v }))} disabled={saving}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="myhonda">MyHonda</SelectItem>
+                <SelectItem value="sagzap">SagZap</SelectItem>
+                <SelectItem value="all">Todos os sistemas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex gap-2 pt-1">
+            <Button variant="outline" className="flex-1" onClick={onClose} disabled={saving}>Cancelar</Button>
+            <Button className="flex-1" onClick={handleSave} disabled={saving || !form.name || !form.email}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
+              Salvar
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 // ─── Users Tab ────────────────────────────────────────────────────────────────
 
 const UsersTab = () => {
   const { toast } = useToast();
   const qc = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
+  const [editUser, setEditUser] = useState<UserItem | null>(null);
   const [permUser, setPermUser] = useState<UserItem | null>(null);
   const [resetPwUser, setResetPwUser] = useState<UserItem | null>(null);
   const [form, setForm] = useState({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "myhonda" });
@@ -545,6 +626,9 @@ const UsersTab = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Editar" onClick={() => setEditUser(u)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Permissões" onClick={() => setPermUser(u)}>
                         <Settings className="h-3.5 w-3.5" />
                       </Button>
@@ -625,6 +709,7 @@ const UsersTab = () => {
         </DialogContent>
       </Dialog>
 
+      <EditUserModal user={editUser} open={!!editUser} onClose={() => setEditUser(null)} />
       <PermissionsModal user={permUser} open={!!permUser} onClose={() => setPermUser(null)} />
       <ResetPasswordModal user={resetPwUser} open={!!resetPwUser} onClose={() => setResetPwUser(null)} />
     </>
