@@ -66,7 +66,7 @@ export function AppSidebar() {
   const userSystem = user?.system || 'myhonda';
   const menuItems = baseMenuItems.filter(item =>
     (!item.adminOnly || user?.isAdmin) &&
-    item.systems.includes(userSystem)
+    (user?.isAdmin || item.systems.includes(userSystem))
   );
 
   const handleNavigation = () => {
