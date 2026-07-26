@@ -355,14 +355,23 @@ const StoresTab = () => {
 
 // ─── Permissions Modal ────────────────────────────────────────────────────────
 
+const SYSTEM_LABELS: Record<string, string> = {
+  myhonda: "MyHonda",
+  sagzap: "SagZap",
+  all: "Comum",
+};
+
 const PermissionsModal = ({ user, open, onClose }: { user: UserItem | null; open: boolean; onClose: () => void }) => {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
 
+  const userSystem = user?.system ?? 'sagzap';
+
   const { data: modules = [] } = useQuery({
-    queryKey: ["permission-modules"],
-    queryFn: fetchPermissionModules,
+    queryKey: ["permission-modules", userSystem],
+    queryFn: () => fetchPermissionModules(userSystem === 'all' ? undefined : userSystem),
+    enabled: open && !!user,
   });
 
   const { data: userPermissions } = useQuery({
@@ -396,25 +405,50 @@ const PermissionsModal = ({ user, open, onClose }: { user: UserItem | null; open
     }
   };
 
+  // Agrupa módulos por system para exibição
+  const grouped = modules.reduce<Record<string, typeof modules>>((acc, mod) => {
+    const g = mod.system === 'all' ? 'all' : mod.system;
+    if (!acc[g]) acc[g] = [];
+    acc[g].push(mod);
+    return acc;
+  }, {});
+  const groupOrder = ['all', 'myhonda', 'sagzap'];
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Permissões</DialogTitle>
-          <p className="text-sm text-muted-foreground">{user?.name}</p>
+          <p className="text-sm text-muted-foreground">
+            {user?.name}
+            {user?.system && (
+              <span className="ml-2 text-xs font-mono opacity-60">({SYSTEM_LABELS[user.system] ?? user.system})</span>
+            )}
+          </p>
         </DialogHeader>
-        <div className="space-y-2 py-1">
-          {modules.map(mod => (
-            <div key={mod.key} className="flex items-center gap-3 py-1">
-              <Checkbox id={`perm-${mod.key}`} checked={selected.includes(mod.key)} onCheckedChange={() => toggle(mod.key)} />
-              <Label htmlFor={`perm-${mod.key}`} className="cursor-pointer text-sm">{mod.name}</Label>
+
+        <div className="overflow-y-auto flex-1 pr-1">
+          {groupOrder.filter(g => grouped[g]?.length).map(g => (
+            <div key={g} className="mb-3">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-0.5">
+                {SYSTEM_LABELS[g] ?? g}
+              </p>
+              <div className="space-y-1">
+                {grouped[g].map(mod => (
+                  <div key={mod.key} className="flex items-center gap-3 py-1 px-1 rounded hover:bg-muted">
+                    <Checkbox id={`perm-${mod.key}`} checked={selected.includes(mod.key.toLowerCase())} onCheckedChange={() => toggle(mod.key.toLowerCase())} />
+                    <Label htmlFor={`perm-${mod.key}`} className="cursor-pointer text-sm">{mod.name}</Label>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
           {modules.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">Nenhum módulo cadastrado</p>
           )}
         </div>
-        <Button className="w-full mt-2" onClick={handleSave} disabled={saving}>
+
+        <Button className="w-full mt-2 shrink-0" onClick={handleSave} disabled={saving}>
           {saving && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
           Salvar
         </Button>

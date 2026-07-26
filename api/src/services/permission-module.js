@@ -58,19 +58,18 @@ export default class PermissionModuleService {
 			items_per_page: filter.items_per_page,
 		});
 
+		const where = { isDeleted: false };
+		if (filter.system) {
+			where.system = [filter.system, 'all'];
+		}
+
 		const [items, total] = await Promise.all([
 			PermissionModule.findAll({
 				...pagination.getQueryParams(),
-				where: {
-					isDeleted: false,
-				},
-				order: [['id', 'ASC']],
+				where,
+				order: [['system', 'ASC'], ['id', 'ASC']],
 			}),
-			PermissionModule.count({
-				where: {
-					isDeleted: false,
-				},
-			}),
+			PermissionModule.count({ where }),
 		]);
 
 		return {

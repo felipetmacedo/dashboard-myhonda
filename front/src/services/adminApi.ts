@@ -39,6 +39,7 @@ export interface PermissionModuleItem {
   id: number;
   name: string;
   key: string;
+  system: string;
 }
 
 export interface UserPermissionItem {
@@ -139,8 +140,10 @@ export const updateUserPermissions = async (
   return unwrap(res);
 };
 
-export const fetchPermissionModules = async (): Promise<PermissionModuleItem[]> => {
-  const res = await apiFetch(`${API_BASE_URL}/permission-modules?page=1&items_per_page=50`);
+export const fetchPermissionModules = async (system?: string): Promise<PermissionModuleItem[]> => {
+  const params = new URLSearchParams({ page: '1', items_per_page: '50' });
+  if (system) params.set('system', system);
+  const res = await apiFetch(`${API_BASE_URL}/permission-modules?${params}`);
   const data = await unwrap(res);
   return data.items ?? data;
 };

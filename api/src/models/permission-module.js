@@ -16,6 +16,11 @@ export default class PermissionModule extends BaseModel {
 				allowNull: false,
 				defaultValue: false,
 				field: 'is_deleted'
+			},
+			system: {
+				type: DataTypes.STRING(20),
+				allowNull: false,
+				defaultValue: 'sagzap',
 			}
 		}, {
 			paranoid: false,
