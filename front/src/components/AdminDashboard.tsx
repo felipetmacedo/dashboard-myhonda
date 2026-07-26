@@ -514,6 +514,8 @@ const UsersTab = () => {
   const [resetPwUser, setResetPwUser] = useState<UserItem | null>(null);
   const [form, setForm] = useState({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "myhonda" });
   const [search, setSearch] = useState("");
+  const [filterSystem, setFilterSystem] = useState("_all");
+  const [filterTipo, setFilterTipo] = useState("_all");
 
   const { data: usersData, isLoading } = useQuery({ queryKey: ["admin-users"], queryFn: fetchUsers });
   const { data: storesData } = useQuery({ queryKey: ["admin-stores"], queryFn: fetchStores });
@@ -521,13 +523,17 @@ const UsersTab = () => {
   const allUsers = usersData?.items ?? [];
   const stores = storesData?.items ?? [];
   const q = search.trim().toLowerCase();
-  const users = q
-    ? allUsers.filter(u =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        (u.phone_number ?? "").toLowerCase().includes(q)
-      )
-    : allUsers;
+
+  const users = allUsers.filter(u => {
+    if (q && !u.name.toLowerCase().includes(q) && !u.email.toLowerCase().includes(q) && !(u.phone_number ?? "").toLowerCase().includes(q)) return false;
+    if (filterSystem !== "_all" && u.system !== filterSystem) return false;
+    if (filterTipo === "admin" && !u.isAdmin) return false;
+    if (filterTipo === "user" && u.isAdmin) return false;
+    return true;
+  });
+
+  const hasFilters = !!q || filterSystem !== "_all" || filterTipo !== "_all";
+  const clearFilters = () => { setSearch(""); setFilterSystem("_all"); setFilterTipo("_all"); };
 
   const handleCreate = async () => {
     if (!form.name || !form.email || !form.password || !form.store_id) return;
@@ -563,29 +569,60 @@ const UsersTab = () => {
     <>
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-muted-foreground">
-          {q ? `${users.length} de ${allUsers.length}` : `${allUsers.length}`} usuário(s)
+          {hasFilters ? `${users.length} de ${allUsers.length}` : `${allUsers.length}`} usuário(s)
         </p>
         <Button size="sm" onClick={() => setCreateOpen(true)}>
           <Plus className="h-4 w-4 mr-1" /> Novo Usuário
         </Button>
       </div>
 
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-        <Input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Pesquisar por nome ou e-mail..."
-          className="pl-9 pr-9"
-        />
-        {search && (
-          <button
-            type="button"
-            onClick={() => setSearch("")}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </button>
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Pesquisar por nome ou e-mail..."
+            className="pl-9 pr-9"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        <Select value={filterSystem} onValueChange={setFilterSystem}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue placeholder="Sistema" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">Todos sistemas</SelectItem>
+            <SelectItem value="myhonda">MyHonda</SelectItem>
+            <SelectItem value="sagzap">SagZap</SelectItem>
+            <SelectItem value="all">Todos (all)</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={filterTipo} onValueChange={setFilterTipo}>
+          <SelectTrigger className="w-full sm:w-36">
+            <SelectValue placeholder="Tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">Todos tipos</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="user">Usuário</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {hasFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="shrink-0 text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4 mr-1" /> Limpar
+          </Button>
         )}
       </div>
 
