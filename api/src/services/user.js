@@ -146,7 +146,7 @@ export default class UserService {
 	async list(storeId, filter) {
 		const pagination = PaginationUtils.config({
 			page: filter.page || 1,
-			items_per_page: filter.itemsPerPage || 10,
+			items_per_page: filter.items_per_page || filter.itemsPerPage || 10,
 		});
 
 		const queryOptions = pagination.getQueryParams();
