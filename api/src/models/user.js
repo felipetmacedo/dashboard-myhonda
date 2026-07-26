@@ -45,7 +45,7 @@ export default class User extends BaseModel {
 			system: {
 				type: DataTypes.STRING(20),
 				allowNull: false,
-				defaultValue: 'myhonda',
+				defaultValue: 'sagzap',
 			}
 		}, {
 			paranoid: false,

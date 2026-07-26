@@ -512,7 +512,7 @@ const UsersTab = () => {
   const [editUser, setEditUser] = useState<UserItem | null>(null);
   const [permUser, setPermUser] = useState<UserItem | null>(null);
   const [resetPwUser, setResetPwUser] = useState<UserItem | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "myhonda" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "sagzap" });
   const [search, setSearch] = useState("");
   const [filterSystem, setFilterSystem] = useState("_all");
   const [filterTipo, setFilterTipo] = useState("_all");
@@ -549,7 +549,7 @@ const UsersTab = () => {
       toast({ title: "Usuário criado com sucesso!" });
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       setCreateOpen(false);
-      setForm({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "myhonda" });
+      setForm({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "sagzap" });
     } catch (e: any) {
       toast({ title: "Erro ao criar usuário", description: e.message, variant: "destructive" });
     }
