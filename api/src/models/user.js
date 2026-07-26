@@ -41,6 +41,11 @@ export default class User extends BaseModel {
 			phone_number: {
 				type: DataTypes.STRING,
 				allowNull: true,
+			},
+			system: {
+				type: DataTypes.STRING(20),
+				allowNull: false,
+				defaultValue: 'myhonda',
 			}
 		}, {
 			paranoid: false,

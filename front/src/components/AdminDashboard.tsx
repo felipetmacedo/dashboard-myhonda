@@ -431,7 +431,7 @@ const UsersTab = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [permUser, setPermUser] = useState<UserItem | null>(null);
   const [resetPwUser, setResetPwUser] = useState<UserItem | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", password: "", phone_number: "", store_id: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "myhonda" });
   const [search, setSearch] = useState("");
 
   const { data: usersData, isLoading } = useQuery({ queryKey: ["admin-users"], queryFn: fetchUsers });
@@ -457,11 +457,12 @@ const UsersTab = () => {
         password: form.password,
         phone_number: form.phone_number || undefined,
         store_id: Number(form.store_id),
+        system: form.system,
       });
       toast({ title: "Usuário criado com sucesso!" });
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       setCreateOpen(false);
-      setForm({ name: "", email: "", password: "", phone_number: "", store_id: "" });
+      setForm({ name: "", email: "", password: "", phone_number: "", store_id: "", system: "myhonda" });
     } catch (e: any) {
       toast({ title: "Erro ao criar usuário", description: e.message, variant: "destructive" });
     }
@@ -517,6 +518,7 @@ const UsersTab = () => {
                 <TableHead>Nome</TableHead>
                 <TableHead>E-mail</TableHead>
                 <TableHead>Telefone</TableHead>
+                <TableHead>Sistema</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead className="w-24"></TableHead>
               </TableRow>
@@ -527,6 +529,14 @@ const UsersTab = () => {
                   <TableCell className="font-medium">{u.name}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{u.phone_number ?? "-"}</TableCell>
+                  <TableCell>
+                    {u.system === 'all'
+                      ? <Badge variant="secondary" className="text-xs">Todos</Badge>
+                      : u.system === 'sagzap'
+                        ? <Badge variant="outline" className="text-xs border-blue-400 text-blue-600">SagZap</Badge>
+                        : <Badge variant="outline" className="text-xs border-primary text-primary">MyHonda</Badge>
+                    }
+                  </TableCell>
                   <TableCell>
                     {u.isAdmin
                       ? <Badge className="text-xs">Admin</Badge>
@@ -552,7 +562,7 @@ const UsersTab = () => {
               ))}
               {users.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-12">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-12">
                     {q ? `Nenhum usuário encontrado para "${search}"` : "Nenhum usuário cadastrado"}
                   </TableCell>
                 </TableRow>
@@ -581,6 +591,17 @@ const UsersTab = () => {
             <div>
               <Label>Telefone</Label>
               <Input value={form.phone_number} onChange={e => setForm(f => ({ ...f, phone_number: e.target.value }))} placeholder="(11) 99999-9999" />
+            </div>
+            <div>
+              <Label>Sistema *</Label>
+              <Select value={form.system} onValueChange={v => setForm(f => ({ ...f, system: v }))}>
+                <SelectTrigger><SelectValue placeholder="Selecione o sistema..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="myhonda">MyHonda</SelectItem>
+                  <SelectItem value="sagzap">SagZap</SelectItem>
+                  <SelectItem value="all">Todos os sistemas</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Loja *</Label>

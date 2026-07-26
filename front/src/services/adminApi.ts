@@ -31,6 +31,7 @@ export interface UserItem {
   email: string;
   phone_number: string | null;
   isAdmin: boolean;
+  system: string;
   is_deleted?: boolean;
 }
 
@@ -94,6 +95,7 @@ export const createUser = async (data: {
   password: string;
   phone_number?: string;
   store_id: number;
+  system?: string;
 }): Promise<UserItem> => {
   const res = await apiFetch(`${API_BASE_URL}/user`, {
     method: 'POST',

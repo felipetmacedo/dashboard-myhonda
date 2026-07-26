@@ -34,6 +34,7 @@ const baseMenuItems = [
     icon: Home,
     description: "Visão Geral",
     adminOnly: false,
+    systems: ["myhonda", "sagzap", "all"],
   },
   {
     title: "Leads MyHonda",
@@ -41,6 +42,7 @@ const baseMenuItems = [
     icon: BarChart2,
     description: "Integração MyHonda",
     adminOnly: false,
+    systems: ["myhonda", "all"],
   },
   {
     title: "Administração",
@@ -48,6 +50,7 @@ const baseMenuItems = [
     icon: ShieldCheck,
     description: "Usuários e Lojas",
     adminOnly: true,
+    systems: ["myhonda", "sagzap", "all"],
   },
 ];
 
@@ -60,7 +63,11 @@ export function AppSidebar() {
 
   const isCollapsed = state === "collapsed";
   const isActive = (path: string) => currentPath === path;
-  const menuItems = baseMenuItems.filter(item => !item.adminOnly || user?.isAdmin);
+  const userSystem = user?.system || 'myhonda';
+  const menuItems = baseMenuItems.filter(item =>
+    (!item.adminOnly || user?.isAdmin) &&
+    item.systems.includes(userSystem)
+  );
 
   const handleNavigation = () => {
     if (window.innerWidth < 768) {

@@ -123,7 +123,7 @@ export default class AuthService {
 	async getSession(userId) {
 		const user = await User.findOne({
 			where: { id: userId, isDeleted: false },
-			attributes: ['id', 'name', 'email', 'isAdmin']
+			attributes: ['id', 'name', 'email', 'isAdmin', 'system']
 		});
 
 		if (!user) {
@@ -136,8 +136,10 @@ export default class AuthService {
 
 		const access = await this.loadUserAccess(user.id, user.isAdmin);
 
+		const plain = user.get({ plain: true });
 		return {
-			user: pick(user.get({ plain: true }), ['id', 'name', 'email', 'isAdmin']),
+			user: pick(plain, ['id', 'name', 'email', 'isAdmin']),
+			system: plain.system || 'myhonda',
 			store: access.store,
 			lojas: access.lojas,
 			codhdaList: access.codhdaList,

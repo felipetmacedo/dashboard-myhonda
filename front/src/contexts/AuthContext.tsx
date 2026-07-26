@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const session = await fetchSession(token);
       const authUser: AuthUser = {
         ...session.user,
+        system: session.system || 'myhonda',
         permissions: session.permissions,
         lojas: session.lojas,
         codhdaList: session.codhdaList,

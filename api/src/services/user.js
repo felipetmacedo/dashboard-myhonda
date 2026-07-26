@@ -151,7 +151,7 @@ export default class UserService {
 
 		const queryOptions = pagination.getQueryParams();
 
-		const userWhere = { isDeleted: false };
+		const userWhere = { isDeleted: false, system: ['myhonda', 'all'] };
 		const orConditions = [];
 		if (filter.name)
 			orConditions.push({ name: { [Op.like]: `%${filter.name}%` } });
@@ -176,7 +176,7 @@ export default class UserService {
 					attributes: ['storeId'],
 				}],
 				order: [['name', 'ASC']],
-				attributes: ['id', 'name', 'email', 'isAdmin', 'document', 'phone_number'],
+				attributes: ['id', 'name', 'email', 'isAdmin', 'document', 'phone_number', 'system'],
 				...queryOptions,
 			}),
 			User.count({
@@ -198,6 +198,7 @@ export default class UserService {
 				isAdmin: user.isAdmin,
 				document: user.document,
 				phone_number: user.phone_number,
+				system: user.system || 'myhonda',
 			};
 		});
 
@@ -238,6 +239,7 @@ export default class UserService {
 					isAdmin: false,
 					phone_number: data.phone_number,
 					isEmailVerified: true,
+					system: data.system || 'myhonda',
 				},
 				{ transaction }
 			);

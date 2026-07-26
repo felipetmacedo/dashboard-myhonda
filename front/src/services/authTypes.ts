@@ -21,6 +21,7 @@ export interface SessionResponse {
     email: string;
     isAdmin: boolean;
   };
+  system: string;
   store: { id: number; name: string } | null;
   lojas: Loja[];
   codhdaList: string[];
@@ -32,6 +33,7 @@ export interface AuthUser {
   name: string;
   email: string;
   isAdmin: boolean;
+  system: string;
   permissions: string[];
   lojas: Loja[];
   codhdaList: string[];
