@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, useCallback, useEffect, useRef, ReactNode } from "react";
+import { createContext, useContext, useState, useMemo, useCallback, useEffect, ReactNode } from "react";
 import { DateRange } from "react-day-picker";
 import { useAuth } from "@/contexts/AuthContext";
 import { LeadsRequest } from "@/services/reportsTypes";
@@ -32,7 +32,6 @@ export function ReportFiltersProvider({ children }: { children: ReactNode }) {
   const [dateRange, setDateRange] = useState<DateRange>(getCurrentMonthDateRange);
   const [selectedCodhdas, setSelectedCodhdas] = useState<string[]>([]);
   const [activeParams, setActiveParams] = useState<LeadsRequest | null>(null);
-  const didAutoApplyRef = useRef(false);
 
   const lojaOptions = useMemo<MultiSelectOption[]>(
     () =>
@@ -61,17 +60,10 @@ export function ReportFiltersProvider({ children }: { children: ReactNode }) {
     if (params) setActiveParams(params);
   }, [buildParams]);
 
-  const buildParamsRef = useRef(buildParams);
-  buildParamsRef.current = buildParams;
-
   useEffect(() => {
-    if (didAutoApplyRef.current || !selectedCodhdas.length) return;
-    const params = buildParamsRef.current();
-    if (params) {
-      setActiveParams(params);
-      didAutoApplyRef.current = true;
-    }
-  }, [selectedCodhdas.length]);
+    const params = buildParams();
+    if (params) setActiveParams(params);
+  }, [buildParams]);
 
   const hasStores = lojaOptions.length > 0;
   const periodLabel = useMemo(() => formatPeriodLabel(dateRange), [dateRange]);
