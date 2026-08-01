@@ -32,6 +32,7 @@ export interface UserItem {
   phone_number: string | null;
   isAdmin: boolean;
   system: string;
+  storeId: number | null;
   is_deleted?: boolean;
 }
 
@@ -110,6 +111,7 @@ export const updateUser = async (id: number, data: {
   email: string;
   phone_number?: string;
   system?: string;
+  store_id?: number | null;
 }): Promise<UserItem> => {
   const res = await apiFetch(`${API_BASE_URL}/user/${id}`, {
     method: 'PUT',

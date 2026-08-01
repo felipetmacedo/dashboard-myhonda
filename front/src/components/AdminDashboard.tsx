@@ -462,8 +462,11 @@ const PermissionsModal = ({ user, open, onClose }: { user: UserItem | null; open
 const EditUserModal = ({ user, open, onClose }: { user: UserItem | null; open: boolean; onClose: () => void }) => {
   const { toast } = useToast();
   const qc = useQueryClient();
-  const [form, setForm] = useState({ name: "", email: "", phone_number: "", system: "myhonda" });
+  const [form, setForm] = useState({ name: "", email: "", phone_number: "", system: "sagzap", store_id: "_none" });
   const [saving, setSaving] = useState(false);
+
+  const { data: storesData } = useQuery({ queryKey: ["admin-stores"], queryFn: fetchStores });
+  const stores = storesData?.items ?? [];
 
   useEffect(() => {
     if (user) {
@@ -471,7 +474,8 @@ const EditUserModal = ({ user, open, onClose }: { user: UserItem | null; open: b
         name: user.name,
         email: user.email,
         phone_number: user.phone_number ?? "",
-        system: user.system ?? "myhonda",
+        system: user.system ?? "sagzap",
+        store_id: user.storeId ? String(user.storeId) : "_none",
       });
     }
   }, [user, open]);
@@ -485,6 +489,7 @@ const EditUserModal = ({ user, open, onClose }: { user: UserItem | null; open: b
         email: form.email,
         phone_number: form.phone_number || undefined,
         system: form.system,
+        store_id: (form.store_id && form.store_id !== "_none") ? Number(form.store_id) : null,
       });
       toast({ title: "Usuário atualizado!" });
       qc.invalidateQueries({ queryKey: ["admin-users"] });
@@ -521,6 +526,18 @@ const EditUserModal = ({ user, open, onClose }: { user: UserItem | null; open: b
                 <SelectItem value="myhonda">MyHonda</SelectItem>
                 <SelectItem value="sagzap">SagZap</SelectItem>
                 <SelectItem value="all">Todos os sistemas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Loja</Label>
+            <Select value={form.store_id} onValueChange={v => setForm(f => ({ ...f, store_id: v }))} disabled={saving}>
+              <SelectTrigger><SelectValue placeholder="Sem loja" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_none">Sem loja</SelectItem>
+                {stores.map(s => (
+                  <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

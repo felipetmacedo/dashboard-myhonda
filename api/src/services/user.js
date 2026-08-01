@@ -198,7 +198,8 @@ export default class UserService {
 				isAdmin: user.isAdmin,
 				document: user.document,
 				phone_number: user.phone_number,
-				system: user.system || 'myhonda',
+				system: user.system || 'sagzap',
+				storeId: user.member?.storeId || null,
 			};
 		});
 
@@ -350,10 +351,35 @@ export default class UserService {
 				{ where: { id, isDeleted: false }, transaction }
 			);
 
+			// Atualiza loja se store_id foi enviado
+			if (data.store_id !== undefined) {
+				const existingMember = await Member.findOne({
+					where: { userId: id, isDeleted: false },
+					transaction,
+				});
+
+				if (data.store_id) {
+					if (existingMember) {
+						if (existingMember.storeId !== data.store_id) {
+							await existingMember.update({ storeId: data.store_id }, { transaction });
+						}
+					} else {
+						await Member.create({
+							storeId: data.store_id,
+							userId: id,
+							isDeleted: false,
+							creatorId: meta.loggedUserId || id,
+						}, { transaction });
+					}
+				} else if (existingMember) {
+					await existingMember.update({ isDeleted: true }, { transaction });
+				}
+			}
+
 			await this.tryCreateLog({
 				type: LogConstants.UPDATE_USER,
 				userId: meta.loggedUserId || id,
-				storeId: meta.storeId || 0,
+				storeId: data.store_id || meta.storeId || 0,
 				targetUserId: id,
 			}, transaction);
 
