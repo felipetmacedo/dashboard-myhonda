@@ -4,7 +4,7 @@ WORKDIR /app
 ENV TZ=America/Recife
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
-COPY --chown=node:node package*.json ./
+COPY --chown=node:node package.json yarn.lock ./
 
 RUN mkdir node_modules \
     && chown -R node:node node_modules
@@ -17,7 +17,7 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-COPY --chown=node:node package*.json ./
+COPY --chown=node:node package.json yarn.lock ./
 
 COPY --chown=node:node --from=development /app/node_modules ./node_modules
 

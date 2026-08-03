@@ -39,7 +39,7 @@
     "mysql2": "^3.14.5",
     "nodemailer": "^6.10.0",
     "prisma": "^5.22.0",
-    "sanitize-html": "^2.7.0",
+    "sanitize-html": "2.15.0",
     "sequelize": "^6.37.5",
     "swagger-ui-express": "^5.0.1",
     "yup": "^0.32.11"
